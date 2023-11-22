@@ -66,6 +66,9 @@
   .input-icon {
     @apply absolute left-4 top-1/2 -translate-y-1/2;
   }
+  .error-message {
+    @apply mb-4 text-red;
+  }
 
   .link {
     @apply text-dark-grey hover:text-black hover:bg-grey p-3 px-4 block opacity-75;
