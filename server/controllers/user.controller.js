@@ -2,7 +2,7 @@ import asyncHandler from 'express-async-handler';
 import bcrypt from 'bcrypt';
 
 import User from '../models/user.model.js';
-import { generateUsername } from '../utils/generateUsername.js';
+import { formatDatatoSend, generateUsername } from '../utils/user-utils.js';
 
 // Signup user
 export const signupUser = asyncHandler(async (req, res) => {
@@ -31,5 +31,26 @@ export const signupUser = asyncHandler(async (req, res) => {
 
   await user.save();
 
-  res.status(200).json({ success: true, user });
+  res.status(200).json(formatDatatoSend(user));
+});
+
+export const signinUser = asyncHandler(async (req, res) => {
+  const { email, password } = req.body;
+
+  const user = await User.findOne({ 'personal_info.email': email });
+
+  if (!user) {
+    return res.status(400).json({ error: 'Invalid email' });
+  }
+
+  const isPasswordMatch = await bcrypt.compare(
+    password,
+    user.personal_info.password
+  );
+
+  if (!isPasswordMatch) {
+    return res.status(403).json({ error: 'Incorrect password' });
+  }
+
+  return res.status(200).json(formatDatatoSend(user));
 });
