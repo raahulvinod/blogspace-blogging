@@ -1,0 +1,27 @@
+export const profileNameList = [
+  'Garfield',
+  'Tinkerbell',
+  'Annie',
+  'Loki',
+  'Cleo',
+  'Angel',
+  'Bob',
+  'Mia',
+  'Coco',
+  'Gracie',
+  'Bear',
+  'Bella',
+  'Abby',
+  'Harley',
+  'Cali',
+  'Leo',
+  'Luna',
+  'Jack',
+  'Felix',
+  'Kiki',
+];
+export const profileCollectionList = [
+  'notionists-neutral',
+  'adventurer-neutral',
+  'fun-emoji',
+];
