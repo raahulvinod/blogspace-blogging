@@ -21,7 +21,7 @@ export const generateUsername = async (email) => {
   }
 };
 
-export const formatDatatoSend = (user) => {
+export const formatDataToSend = (user) => {
   const access_token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);
 
   return {

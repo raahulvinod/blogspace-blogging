@@ -2,7 +2,7 @@ import asyncHandler from 'express-async-handler';
 import bcrypt from 'bcrypt';
 
 import User from '../models/user.model.js';
-import { formatDatatoSend, generateUsername } from '../utils/user-utils.js';
+import { formatDataToSend, generateUsername } from '../utils/user-utils.js';
 
 // Signup user
 export const signupUser = asyncHandler(async (req, res) => {
@@ -12,9 +12,7 @@ export const signupUser = asyncHandler(async (req, res) => {
   const existingUser = await User.findOne({ 'personal_info.email': email });
 
   if (existingUser) {
-    return res
-      .status(400)
-      .json({ success: false, error: 'Email is already exists.' });
+    return res.status(409).json({ error: 'Email is already exists.' });
   }
 
   const hashedPassword = await bcrypt.hash(password, 10);
@@ -31,16 +29,17 @@ export const signupUser = asyncHandler(async (req, res) => {
 
   await user.save();
 
-  res.status(200).json(formatDatatoSend(user));
+  res.status(201).json(formatDataToSend(user));
 });
 
+// signin user
 export const signinUser = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
 
   const user = await User.findOne({ 'personal_info.email': email });
 
   if (!user) {
-    return res.status(400).json({ error: 'Invalid email' });
+    return res.status(401).json({ error: 'Invalid email' });
   }
 
   const isPasswordMatch = await bcrypt.compare(
@@ -49,8 +48,8 @@ export const signinUser = asyncHandler(async (req, res) => {
   );
 
   if (!isPasswordMatch) {
-    return res.status(403).json({ error: 'Incorrect password' });
+    return res.status(401).json({ error: 'Incorrect password' });
   }
 
-  return res.status(200).json(formatDatatoSend(user));
+  return res.status(200).json(formatDataToSend(user));
 });
