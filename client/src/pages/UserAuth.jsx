@@ -1,6 +1,8 @@
 import { Link } from 'react-router-dom';
 import { Formik, Form, Field } from 'formik';
 import * as Yup from 'yup';
+import axios from 'axios';
+import { Toaster, toast } from 'react-hot-toast';
 
 import InputBox from '../components/InputBox';
 import AnimationWrapper from '../utils/animation';
@@ -44,14 +46,33 @@ const UserAuth = ({ type }) => {
     type: type,
   };
 
-  const handleSubmit = (values) => {
-    // Handle form submission here
-    console.log(values);
+  const handleUserAuthentication = async (
+    serverRoute,
+    values,
+    { resetForm }
+  ) => {
+    try {
+      const { data } = await axios.post(
+        import.meta.env.VITE_SERVER_DOMAIN + serverRoute,
+        values
+      );
+      console.log(data);
+      resetForm();
+    } catch (error) {
+      toast.error(error.response.data.error);
+    }
+  };
+
+  const handleSubmit = (values, { resetForm }) => {
+    const serverRoute = type === 'sign-in' ? '/signin' : '/signup';
+
+    handleUserAuthentication(serverRoute, values, { resetForm });
   };
 
   return (
     <AnimationWrapper keyValue={type}>
       <section className="h-cover flex items-center justify-center">
+        <Toaster />
         <Formik
           initialValues={initialValues}
           validationSchema={validationSchema}
