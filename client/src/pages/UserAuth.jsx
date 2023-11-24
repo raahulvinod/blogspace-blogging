@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import { Link, Navigate } from 'react-router-dom';
 import { Formik, Form, Field } from 'formik';
 import * as Yup from 'yup';
 import axios from 'axios';
@@ -7,6 +7,9 @@ import { Toaster, toast } from 'react-hot-toast';
 import InputBox from '../components/InputBox';
 import AnimationWrapper from '../utils/animation';
 import googleIcon from '../images/google.png';
+import { storeInSession } from '../utils/sessions';
+import { useContext } from 'react';
+import { UserContext } from '../App';
 
 const validationSchema = Yup.object({
   fullname: Yup.string().test({
@@ -39,6 +42,11 @@ const validationSchema = Yup.object({
 });
 
 const UserAuth = ({ type }) => {
+  const { userAuth: { access_token } = { access_token: null }, setUserAuth } =
+    useContext(UserContext);
+
+  console.log(access_token);
+
   const initialValues = {
     fullname: type === 'sign-up' ? '' : undefined,
     email: '',
@@ -56,7 +64,8 @@ const UserAuth = ({ type }) => {
         import.meta.env.VITE_SERVER_DOMAIN + serverRoute,
         values
       );
-      console.log(data);
+      storeInSession('user', JSON.stringify(data));
+      setUserAuth(data);
       resetForm();
     } catch (error) {
       toast.error(error.response.data.error);
@@ -69,7 +78,9 @@ const UserAuth = ({ type }) => {
     handleUserAuthentication(serverRoute, values, { resetForm });
   };
 
-  return (
+  return access_token ? (
+    <Navigate to="/" />
+  ) : (
     <AnimationWrapper keyValue={type}>
       <section className="h-cover flex items-center justify-center">
         <Toaster />
