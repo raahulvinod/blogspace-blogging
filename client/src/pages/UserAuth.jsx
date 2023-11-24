@@ -66,6 +66,7 @@ const UserAuth = ({ type }) => {
       );
       storeInSession('user', JSON.stringify(data));
       setUserAuth(data);
+
       resetForm();
     } catch (error) {
       toast.error(error.response.data.error);
