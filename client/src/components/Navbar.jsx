@@ -19,8 +19,6 @@ const Navbar = () => {
     setUserAuth({ access_token: null });
   };
 
-  const handleUserNavPanel = () => {};
-
   return (
     <>
       <nav className="navbar">

@@ -3,13 +3,14 @@ import { Formik, Form, Field } from 'formik';
 import * as Yup from 'yup';
 import axios from 'axios';
 import { Toaster, toast } from 'react-hot-toast';
+import { useContext } from 'react';
 
 import InputBox from '../components/InputBox';
 import AnimationWrapper from '../utils/animation';
 import googleIcon from '../images/google.png';
 import { storeInSession } from '../utils/sessions';
-import { useContext } from 'react';
 import { UserContext } from '../App';
+import { signInWithGoogle } from '../utils/firebase';
 
 const validationSchema = Yup.object({
   fullname: Yup.string().test({
@@ -45,8 +46,6 @@ const UserAuth = ({ type }) => {
   const { userAuth: { access_token } = { access_token: null }, setUserAuth } =
     useContext(UserContext);
 
-  console.log(access_token);
-
   const initialValues = {
     fullname: type === 'sign-up' ? '' : undefined,
     email: '',
@@ -54,11 +53,7 @@ const UserAuth = ({ type }) => {
     type: type,
   };
 
-  const handleUserAuthentication = async (
-    serverRoute,
-    values,
-    { resetForm }
-  ) => {
+  const handleUserAuthentication = async (serverRoute, values) => {
     try {
       const { data } = await axios.post(
         import.meta.env.VITE_SERVER_DOMAIN + serverRoute,
@@ -66,17 +61,34 @@ const UserAuth = ({ type }) => {
       );
       storeInSession('user', JSON.stringify(data));
       setUserAuth(data);
-
-      resetForm();
     } catch (error) {
       toast.error(error.response.data.error);
     }
   };
 
-  const handleSubmit = (values, { resetForm }) => {
+  const handleSubmit = (values) => {
     const serverRoute = type === 'sign-in' ? '/signin' : '/signup';
 
-    handleUserAuthentication(serverRoute, values, { resetForm });
+    handleUserAuthentication(serverRoute, values);
+  };
+
+  const handleGoogleAuth = async (e) => {
+    e.preventDefault();
+
+    const serverRoute = '/google-auth';
+
+    try {
+      const user = await signInWithGoogle();
+
+      const data = {
+        access_token: user.accessToken,
+      };
+
+      handleUserAuthentication(serverRoute, data);
+    } catch (error) {
+      toast.error('Trouble logging in through Google');
+      console.error(error);
+    }
   };
 
   return access_token ? (
@@ -139,7 +151,10 @@ const UserAuth = ({ type }) => {
               <hr className="w-1/2 border-black" />
             </div>
 
-            <button className="btn-dark flex items-center justify-center gap-4 w-[90%] center">
+            <button
+              className="btn-dark flex items-center justify-center gap-4 w-[90%] center"
+              onClick={handleGoogleAuth}
+            >
               <img src={googleIcon} alt="google logo" className="w-5" />
               continue with google
             </button>
