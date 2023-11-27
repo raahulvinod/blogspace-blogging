@@ -4,7 +4,10 @@ import { getAuth } from 'firebase-admin/auth';
 
 import admin from '../config/firebase.js';
 import User from '../models/user.model.js';
-import { formatDataToSend, generateUsername } from '../utils/user-utils.js';
+import {
+  formatDataToSend,
+  generateUsername,
+} from '../services/user.service.js';
 
 // Signup user
 export const signupUser = asyncHandler(async (req, res) => {
