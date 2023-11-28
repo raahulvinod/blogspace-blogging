@@ -15,15 +15,20 @@ const BlogEditor = () => {
     blog,
     blog: { title, banner, content, tags, des },
     setBlog,
+    textEditor,
+    setTextEditor,
+    setEditorState,
   } = useContext(EditorContext);
 
   useEffect(() => {
-    let editor = new EditorJS({
-      holder: 'textEditor',
-      data: '',
-      tools: tools,
-      placeholder: 'Lets write something...',
-    });
+    setTextEditor(
+      new EditorJS({
+        holder: 'textEditor',
+        data: '',
+        tools: tools,
+        placeholder: 'Lets write something...',
+      })
+    );
   }, []);
 
   const handleBannerUpload = async (e) => {
@@ -69,6 +74,31 @@ const BlogEditor = () => {
     img.src = deafaultBanner;
   };
 
+  const handlePublish = async () => {
+    if (!banner.length) {
+      return toast.error('Upload a blog banner to publish it.');
+    }
+
+    if (!title.length) {
+      return toast.error('Write blog title to publish it.');
+    }
+
+    if (textEditor.isReady) {
+      try {
+        const data = await textEditor.save();
+
+        if (data.blocks.length) {
+          setBlog({ ...blog, content: data });
+          setEditorState('publish');
+        } else {
+          toast.error('Write content in your blog to publish it.');
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    }
+  };
+
   return (
     <>
       <nav className="navbar">
@@ -80,7 +110,9 @@ const BlogEditor = () => {
         </p>
 
         <div className="flex gap-4 ml-auto">
-          <button className="btn-dark py-2">Publish</button>
+          <button className="btn-dark py-2" onClick={handlePublish}>
+            Publish
+          </button>
           <button className="btn-light py-2">Save Draft</button>
         </div>
       </nav>
