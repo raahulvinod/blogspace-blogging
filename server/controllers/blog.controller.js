@@ -11,3 +11,8 @@ export const getUploadURL = asyncHandler(async (req, res) => {
 
   res.status(200).json({ uploadURL: url });
 });
+
+// Create a blog
+export const createBlog = asyncHandler(async (req, res) => {
+  return res.json(req.body);
+});
