@@ -1,16 +1,27 @@
 import toast, { Toaster } from 'react-hot-toast';
+import { useNavigate } from 'react-router-dom';
 import AnimationWrapper from '../utils/animation';
-import { useContext } from 'react';
+import { useContext, useState } from 'react';
 import { EditorContext } from '../pages/Editor';
+import axios from 'axios';
+
 import Tags from './Tags';
+import { UserContext } from '../App';
 
 const PublishForm = () => {
   const {
     blog,
-    blog: { banner, title, tags, des },
+    blog: { banner, title, tags, des, content },
     setBlog,
     setEditorState,
   } = useContext(EditorContext);
+
+  const {
+    userAuth: { access_token },
+  } = useContext(UserContext);
+
+  const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
 
   let characterLimit = 200;
   let tagLimit = 10;
@@ -52,6 +63,61 @@ const PublishForm = () => {
       }
 
       e.target.value = '';
+    }
+  };
+
+  const publishBlog = async () => {
+    let loadingToast;
+
+    try {
+      if (!title.length) {
+        return toast.error('Write blog title before publishing.');
+      }
+
+      if (!des.length || des.length > characterLimit) {
+        return toast.error(
+          `Write description under ${characterLimit} characters.`
+        );
+      }
+
+      if (!tags.length) {
+        return toast.error('Enter at least 1 tag to help rank your blog.');
+      }
+
+      setIsLoading(true);
+      loadingToast = toast.loading('Publishing...');
+
+      const blogData = {
+        title,
+        des,
+        banner,
+        tags,
+        content,
+        draft: false,
+      };
+
+      await axios.post(
+        import.meta.env.VITE_SERVER_DOMAIN + '/create-blog',
+        blogData,
+        {
+          headers: {
+            Authorization: `Bearer ${access_token}`,
+          },
+        }
+      );
+
+      setIsLoading(false);
+      toast.dismiss(loadingToast);
+      toast.success('Blog published');
+
+      setTimeout(() => {
+        navigate('/');
+      }, 500);
+    } catch (error) {
+      setIsLoading(false);
+
+      toast.dismiss(loadingToast);
+      toast.error(error.response.data.error);
     }
   };
 
@@ -123,7 +189,19 @@ const PublishForm = () => {
           <p className="mt-1 mb-4 text-dark-grey text-sm text-right">
             {tagLimit - tags.length} tags left
           </p>
-          <button className="btn-dark px-8">Publish</button>
+          <button
+            className="btn-dark px-8 relative"
+            onClick={publishBlog}
+            disabled={isLoading}
+            style={{ filter: isLoading ? 'blur(0.5px)' : 'none' }}
+          >
+            {isLoading && (
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className="animate-spin rounded-full h-6 w-6 border-t-2 border-b-2 border-dark"></div>
+              </div>
+            )}
+            Publish
+          </button>
         </div>
       </section>
     </AnimationWrapper>
