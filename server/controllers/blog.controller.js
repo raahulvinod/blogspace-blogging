@@ -85,3 +85,23 @@ export const createBlog = asyncHandler(async (req, res) => {
 
   return res.status(200).json({ id: blog.blog_id });
 });
+
+// Get latest blogs
+export const latestBlogs = asyncHandler(async (req, res) => {
+  try {
+    let maxLimit = 5;
+
+    const blogs = await Blog.find({ draft: false })
+      .populate(
+        'author',
+        'personal_info.profile_img personal_info.fullname personal_info.username -_id'
+      )
+      .sort({ publishedAt: -1 })
+      .select('blog_id title des activity tags publishedAt -_id')
+      .limit(maxLimit);
+
+    return res.status(200).json({ blogs });
+  } catch (error) {
+    throw error;
+  }
+});
