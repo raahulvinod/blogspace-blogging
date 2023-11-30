@@ -1,13 +1,15 @@
-import { Link } from 'react-router-dom';
-import { useContext, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { useContext, useEffect, useState } from 'react';
 import { Toaster, toast } from 'react-hot-toast';
+import axios from 'axios';
+import EditorJS from '@editorjs/editorjs';
 
 import logo from '../images/blog.png';
 import AnimationWrapper from '../utils/animation';
 import deafaultBanner from '../images/blog banner.png';
+import { UserContext } from '../App';
 import { uploadImage } from '../utils/aws';
 import { EditorContext } from '../pages/Editor';
-import EditorJS from '@editorjs/editorjs';
 import { tools } from './Tools';
 
 const BlogEditor = () => {
@@ -20,15 +22,23 @@ const BlogEditor = () => {
     setEditorState,
   } = useContext(EditorContext);
 
+  const { userAuth: { access_token } = {} } = useContext(UserContext);
+
+  const [isLoading, setIsLoading] = useState(false);
+
+  const navigate = useNavigate();
+
   useEffect(() => {
-    setTextEditor(
-      new EditorJS({
-        holder: 'textEditor',
-        data: content,
-        tools: tools,
-        placeholder: 'Lets write something...',
-      })
-    );
+    if (!textEditor.isReady) {
+      setTextEditor(
+        new EditorJS({
+          holder: 'textEditor',
+          data: content,
+          tools: tools,
+          placeholder: 'Lets write something...',
+        })
+      );
+    }
   }, []);
 
   const handleBannerUpload = async (e) => {
@@ -75,28 +85,78 @@ const BlogEditor = () => {
   };
 
   const handlePublish = async () => {
-    // if (!banner.length) {
-    //   return toast.error('Upload a blog banner to publish it.');
-    // }
+    if (!banner.length) {
+      return toast.error('Upload a blog banner to publish it.');
+    }
 
-    // if (!title.length) {
-    //   return toast.error('Write blog title to publish it.');
-    // }
+    if (!title.length) {
+      return toast.error('Write blog title to publish it.');
+    }
 
-    // if (textEditor.isReady) {
-    // try {
-    const data = await textEditor.save();
+    if (textEditor.isReady) {
+      try {
+        const data = await textEditor.save();
 
-    // if (data.blocks.length) {
-    setBlog({ ...blog, content: data });
-    setEditorState('publish');
-    // } else {
-    // toast.error('Write content in your blog to publish it.');
-    // }
-    // } catch (error) {
-    //   console.error(error);
-    // }
-    // }
+        if (data.blocks.length) {
+          setBlog({ ...blog, content: data });
+          setEditorState('publish');
+        } else {
+          toast.error('Write content in your blog to publish it.');
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    }
+  };
+
+  const handleSaveDraft = async () => {
+    let loadingToast;
+
+    try {
+      if (!title.length) {
+        return toast.error('Write blog title before saving it as a draft.');
+      }
+
+      setIsLoading(true);
+      loadingToast = toast.loading('Saving draft...');
+
+      if (textEditor.isReady) {
+        const content = await textEditor.save();
+
+        const blogData = {
+          title,
+          des,
+          banner,
+          tags,
+          content,
+          draft: true,
+        };
+
+        await axios.post(
+          import.meta.env.VITE_SERVER_DOMAIN + '/create-blog',
+          blogData,
+          {
+            headers: {
+              Authorization: `Bearer ${access_token}`,
+            },
+          }
+        );
+
+        setIsLoading(false);
+        toast.dismiss(loadingToast);
+        toast.success('Saved.');
+
+        setTimeout(() => {
+          navigate('/');
+        }, 500);
+      }
+    } catch (error) {
+      console.error(error);
+
+      setIsLoading(false);
+      toast.dismiss(loadingToast);
+      toast.error(error.response.data.error);
+    }
   };
 
   return (
@@ -113,7 +173,13 @@ const BlogEditor = () => {
           <button className="btn-dark py-2" onClick={handlePublish}>
             Publish
           </button>
-          <button className="btn-light py-2">Save Draft</button>
+          <button
+            className="btn-light py-2"
+            onClick={handleSaveDraft}
+            disabled={isLoading}
+          >
+            Save Draft
+          </button>
         </div>
       </nav>
       <Toaster />

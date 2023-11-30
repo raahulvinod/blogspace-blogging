@@ -23,29 +23,31 @@ export const createBlog = asyncHandler(async (req, res) => {
   let { title, banner, content, tags, des, draft } = req.body;
 
   if (!title || !title.length) {
-    return res.status(403).json({ error: 'Title is required for publishing.' });
+    return res.status(403).json({ error: 'Title is required.' });
   }
 
-  if (!des || !des.length || des.length > 200) {
-    return res.status(403).json({
-      error: 'Description is required and must be under 200 characters.',
-    });
-  }
+  if (!draft) {
+    if (!des || !des.length || des.length > 200) {
+      return res.status(403).json({
+        error: 'Description is required and must be under 200 characters.',
+      });
+    }
 
-  if (!banner || !banner.length) {
-    return res.status(403).json({ error: 'Banner image is required.' });
-  }
+    if (!banner || !banner.length) {
+      return res.status(403).json({ error: 'Banner image is required.' });
+    }
 
-  if (!content || !content.blocks || !content.blocks.length) {
-    return res
-      .status(403)
-      .json({ error: 'Content is required for publishing.' });
-  }
+    if (!content || !content.blocks || !content.blocks.length) {
+      return res
+        .status(403)
+        .json({ error: 'Content is required for publishing.' });
+    }
 
-  if (!tags || !tags.length || tags.length > 10) {
-    return res.status(403).json({
-      error: 'Provide tags for the blog, up to a maximum of 10.',
-    });
+    if (!tags || !tags.length || tags.length > 10) {
+      return res.status(403).json({
+        error: 'Provide tags for the blog, up to a maximum of 10.',
+      });
+    }
   }
 
   tags = tags.map((tag) => tag.toLowerCase());
