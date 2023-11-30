@@ -97,7 +97,7 @@ export const latestBlogs = asyncHandler(async (req, res) => {
         'personal_info.profile_img personal_info.fullname personal_info.username -_id'
       )
       .sort({ publishedAt: -1 })
-      .select('blog_id title des activity tags publishedAt -_id')
+      .select('blog_id title des banner activity tags publishedAt -_id')
       .limit(maxLimit);
 
     return res.status(200).json({ blogs });
