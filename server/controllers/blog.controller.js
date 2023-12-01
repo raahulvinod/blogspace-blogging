@@ -127,3 +127,27 @@ export const trendingBlogs = asyncHandler(async (req, res) => {
     throw error;
   }
 });
+
+// Search blogs
+export const searchBlogs = asyncHandler(async (req, res) => {
+  try {
+    const { tag } = req.body;
+
+    const findQuery = { tags: tag, draft: false };
+
+    const maxLimit = 5;
+
+    const blogs = await Blog.find(findQuery)
+      .populate(
+        'author',
+        'personal_info.profile_img personal_info.fullname personal_info.username -_id'
+      )
+      .sort({ publishedAt: -1 })
+      .select('blog_id title des banner activity tags publishedAt -_id')
+      .limit(maxLimit);
+
+    return res.status(200).json({ blogs });
+  } catch (error) {
+    throw error;
+  }
+});
