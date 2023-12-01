@@ -145,11 +145,11 @@ export const trendingBlogs = asyncHandler(async (req, res) => {
 // Search blogs
 export const searchBlogs = asyncHandler(async (req, res) => {
   try {
-    const { tag } = req.body;
+    const { tag, page } = req.body;
 
     const findQuery = { tags: tag, draft: false };
 
-    const maxLimit = 5;
+    const maxLimit = 1;
 
     const blogs = await Blog.find(findQuery)
       .populate(
@@ -158,9 +158,23 @@ export const searchBlogs = asyncHandler(async (req, res) => {
       )
       .sort({ publishedAt: -1 })
       .select('blog_id title des banner activity tags publishedAt -_id')
+      .skip((page - 1) * maxLimit)
       .limit(maxLimit);
 
     return res.status(200).json({ blogs });
+  } catch (error) {
+    throw error;
+  }
+});
+
+export const searchBlogCount = asyncHandler(async (req, res) => {
+  try {
+    const { tag } = req.body;
+    const findQuery = { tags: tag, draft: false };
+
+    const count = await Blog.countDocuments(findQuery);
+
+    res.status(200).json({ totalDocs: count });
   } catch (error) {
     throw error;
   }

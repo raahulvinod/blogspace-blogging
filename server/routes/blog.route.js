@@ -3,6 +3,7 @@ import {
   createBlog,
   getUploadURL,
   latestBlogs,
+  searchBlogCount,
   searchBlogs,
   totalBlogCount,
   trendingBlogs,
@@ -17,5 +18,6 @@ router.post('/create-blog', verifyToken, createBlog);
 router.post('/search-blogs', searchBlogs);
 router.post('/latest-blogs', latestBlogs);
 router.post('/all-latest-blog-count', totalBlogCount);
+router.post('/search-blog-count', searchBlogCount);
 
 export default router;

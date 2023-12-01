@@ -34,16 +34,12 @@ const Home = () => {
       }
     );
 
-    console.log(data.blogs);
-
     const formatedData = await filterPagination({
       state: blogs,
       data: data.blogs,
       page,
       countRoute: '/all-latest-blog-count',
     });
-
-    console.log(formatedData);
 
     setBlogs(formatedData);
   };
@@ -69,14 +65,24 @@ const Home = () => {
     }
   };
 
-  const fetchBlogsByCategory = async () => {
-    const {
-      data: { blogs },
-    } = await axios.post(import.meta.env.VITE_SERVER_DOMAIN + '/search-blogs', {
-      tag: pageState,
+  const fetchBlogsByCategory = async ({ page = 1 }) => {
+    const { data } = await axios.post(
+      import.meta.env.VITE_SERVER_DOMAIN + '/search-blogs',
+      {
+        tag: pageState,
+        page,
+      }
+    );
+
+    const formatedData = await filterPagination({
+      state: blogs,
+      data: data.blogs,
+      page,
+      countRoute: '/search-blog-count',
+      data_to_send: { tag: pageState },
     });
-    console.log(blogs);
-    setBlogs(blogs);
+
+    setBlogs(formatedData);
   };
 
   useEffect(() => {
@@ -85,7 +91,7 @@ const Home = () => {
     if (pageState === 'home') {
       fetchLatestBlogs({ page: 1 });
     } else {
-      fetchBlogsByCategory();
+      fetchBlogsByCategory({ page: 1 });
     }
 
     if (!trendingBlogs) {
@@ -120,7 +126,12 @@ const Home = () => {
               ) : (
                 <NoData message="No blogs published" />
               )}
-              <LoadMoreButton state={blogs} fetchData={fetchLatestBlogs} />
+              <LoadMoreButton
+                state={blogs}
+                fetchData={
+                  pageState === 'home' ? fetchLatestBlogs : fetchBlogsByCategory
+                }
+              />
             </>
 
             {trendingBlogs == null ? (
