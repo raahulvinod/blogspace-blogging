@@ -52,11 +52,23 @@ const Home = () => {
     }
   };
 
+  const fetchBlogsByCategory = async () => {
+    const {
+      data: { blogs },
+    } = await axios.post(import.meta.env.VITE_SERVER_DOMAIN + '/search-blogs', {
+      tag: pageState,
+    });
+
+    setBlogs(blogs);
+  };
+
   useEffect(() => {
     activeTabRef.current.click();
 
     if (pageState === 'home') {
       fetchLatestBlogs();
+    } else {
+      fetchBlogsByCategory();
     }
 
     if (!trendingBlogs) {
