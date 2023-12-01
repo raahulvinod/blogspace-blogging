@@ -89,7 +89,9 @@ export const createBlog = asyncHandler(async (req, res) => {
 // Get latest blogs
 export const latestBlogs = asyncHandler(async (req, res) => {
   try {
-    let maxLimit = 5;
+    const { page } = req.body;
+
+    const maxLimit = 5;
 
     const blogs = await Blog.find({ draft: false })
       .populate(
@@ -98,6 +100,7 @@ export const latestBlogs = asyncHandler(async (req, res) => {
       )
       .sort({ publishedAt: -1 })
       .select('blog_id title des banner activity tags publishedAt -_id')
+      .skip((page - 1) * maxLimit)
       .limit(maxLimit);
 
     return res.status(200).json({ blogs });

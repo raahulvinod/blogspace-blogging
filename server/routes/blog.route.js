@@ -11,9 +11,9 @@ import verifyToken from '../middlewares/verifyToken.js';
 const router = express();
 
 router.get('/get-upload-url', getUploadURL);
-router.get('/latest-blogs', latestBlogs);
 router.get('/trending-blogs', trendingBlogs);
 router.post('/create-blog', verifyToken, createBlog);
 router.post('/search-blogs', searchBlogs);
+router.post('/latest-blogs', latestBlogs);
 
 export default router;

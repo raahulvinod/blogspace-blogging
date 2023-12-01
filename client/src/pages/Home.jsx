@@ -24,12 +24,15 @@ const Home = () => {
     'travel',
   ];
 
-  const fetchLatestBlogs = async () => {
+  const fetchLatestBlogs = async (page = 2) => {
     const {
       data: { blogs },
-    } = await axios.get(import.meta.env.VITE_SERVER_DOMAIN + '/latest-blogs');
+    } = await axios.post(import.meta.env.VITE_SERVER_DOMAIN + '/latest-blogs', {
+      page,
+    });
 
-    setBlogs(blogs);
+    console.log(blogs);
+    // setBlogs(blogs);
   };
 
   const fetchTrendingBlogs = async () => {
