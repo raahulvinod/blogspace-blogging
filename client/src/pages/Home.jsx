@@ -7,6 +7,8 @@ import { Loader } from '../components/Loader';
 import BlogPostCard from '../components/BlogPostCard';
 import MinimalBlogPost from '../components/MinimalBlogPost';
 import NoData from '../components/NoData';
+import { filterPagination } from '../utils/filterPagination';
+import LoadMoreButton from '../components/LoadMoreButton';
 
 const Home = () => {
   const [blogs, setBlogs] = useState(null);
@@ -24,15 +26,26 @@ const Home = () => {
     'travel',
   ];
 
-  const fetchLatestBlogs = async (page = 2) => {
-    const {
-      data: { blogs },
-    } = await axios.post(import.meta.env.VITE_SERVER_DOMAIN + '/latest-blogs', {
+  const fetchLatestBlogs = async ({ page = 1 }) => {
+    const { data } = await axios.post(
+      import.meta.env.VITE_SERVER_DOMAIN + '/latest-blogs',
+      {
+        page,
+      }
+    );
+
+    console.log(data.blogs);
+
+    const formatedData = await filterPagination({
+      state: blogs,
+      data: data.blogs,
       page,
+      countRoute: '/all-latest-blog-count',
     });
 
-    console.log(blogs);
-    // setBlogs(blogs);
+    console.log(formatedData);
+
+    setBlogs(formatedData);
   };
 
   const fetchTrendingBlogs = async () => {
@@ -62,7 +75,7 @@ const Home = () => {
     } = await axios.post(import.meta.env.VITE_SERVER_DOMAIN + '/search-blogs', {
       tag: pageState,
     });
-
+    console.log(blogs);
     setBlogs(blogs);
   };
 
@@ -70,7 +83,7 @@ const Home = () => {
     activeTabRef.current.click();
 
     if (pageState === 'home') {
-      fetchLatestBlogs();
+      fetchLatestBlogs({ page: 1 });
     } else {
       fetchBlogsByCategory();
     }
@@ -92,8 +105,8 @@ const Home = () => {
             <>
               {blogs == null ? (
                 <Loader />
-              ) : blogs.length ? (
-                blogs.map((blog, i) => (
+              ) : blogs.results.length ? (
+                blogs.results.map((blog, i) => (
                   <AnimationWrapper
                     transition={{ duration: 1, delay: i * 0.1 }}
                     key={i}
@@ -107,6 +120,7 @@ const Home = () => {
               ) : (
                 <NoData message="No blogs published" />
               )}
+              <LoadMoreButton state={blogs} fetchData={fetchLatestBlogs} />
             </>
 
             {trendingBlogs == null ? (

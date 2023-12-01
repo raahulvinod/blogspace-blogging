@@ -109,6 +109,17 @@ export const latestBlogs = asyncHandler(async (req, res) => {
   }
 });
 
+// Total blogs count
+export const totalBlogCount = asyncHandler(async (req, res) => {
+  try {
+    const count = await Blog.countDocuments({ draft: false });
+
+    res.status(200).json({ totalDocs: count });
+  } catch (error) {
+    throw error;
+  }
+});
+
 // Get trending blogs
 export const trendingBlogs = asyncHandler(async (req, res) => {
   try {
