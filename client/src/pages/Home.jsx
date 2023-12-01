@@ -6,6 +6,7 @@ import AnimationWrapper from '../utils/animation';
 import { Loader } from '../components/Loader';
 import BlogPostCard from '../components/BlogPostCard';
 import MinimalBlogPost from '../components/MinimalBlogPost';
+import NoData from '../components/NoData';
 
 const Home = () => {
   const [blogs, setBlogs] = useState(null);
@@ -88,7 +89,7 @@ const Home = () => {
             <>
               {blogs == null ? (
                 <Loader />
-              ) : (
+              ) : blogs.length ? (
                 blogs.map((blog, i) => (
                   <AnimationWrapper
                     transition={{ duration: 1, delay: i * 0.1 }}
@@ -100,12 +101,14 @@ const Home = () => {
                     />
                   </AnimationWrapper>
                 ))
+              ) : (
+                <NoData message="No blogs published" />
               )}
             </>
 
             {trendingBlogs == null ? (
               <Loader />
-            ) : (
+            ) : trendingBlogs.length ? (
               trendingBlogs.map((blog, i) => (
                 <AnimationWrapper
                   transition={{ duration: 1, delay: i * 0.1 }}
@@ -114,6 +117,8 @@ const Home = () => {
                   <MinimalBlogPost blog={blog} index={i} />
                 </AnimationWrapper>
               ))
+            ) : (
+              <NoData message="No trending blogs" />
             )}
           </InpageNavigation>
         </div>
@@ -146,7 +151,7 @@ const Home = () => {
               </h1>
               {trendingBlogs == null ? (
                 <Loader />
-              ) : (
+              ) : trendingBlogs.length ? (
                 trendingBlogs.map((blog, i) => (
                   <AnimationWrapper
                     transition={{ duration: 1, delay: i * 0.1 }}
@@ -155,6 +160,8 @@ const Home = () => {
                     <MinimalBlogPost blog={blog} index={i} />
                   </AnimationWrapper>
                 ))
+              ) : (
+                <NoData message="No trending blogs" />
               )}
             </div>
           </div>
