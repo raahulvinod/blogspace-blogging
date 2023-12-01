@@ -105,3 +105,25 @@ export const latestBlogs = asyncHandler(async (req, res) => {
     throw error;
   }
 });
+
+// Get trending blogs
+export const trendingBlogs = asyncHandler(async (req, res) => {
+  try {
+    const blogs = await Blog.find({ draft: false })
+      .populate(
+        'author',
+        'personal_info.profile_img personal_info.fullname personal_info.username -_id'
+      )
+      .sort({
+        'activity.total_read': -1,
+        'activity.total_likes': -1,
+        publishedAt: -1,
+      })
+      .select('blog_id title publishedAt -_id')
+      .limit(5);
+
+    return res.status(200).json({ blogs });
+  } catch (error) {
+    throw error;
+  }
+});
