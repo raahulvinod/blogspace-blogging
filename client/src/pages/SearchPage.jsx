@@ -12,6 +12,7 @@ import { filterPagination } from '../utils/filterPagination';
 const SearchPage = () => {
   const { query } = useParams();
   const [blogs, setBlogs] = useState(null);
+  const [users, setUsers] = useState(null);
 
   const searchBlogs = async ({ page = 1, create_new_arr = false }) => {
     const { data } = await axios.post(
@@ -36,11 +37,24 @@ const SearchPage = () => {
 
   const resetState = () => {
     setBlogs(null);
+    setUsers(null);
+  };
+
+  const fetchUsers = async () => {
+    const { data: users } = await axios.post(
+      import.meta.env.VITE_SERVER_DOMAIN + '/search-users',
+      {
+        query,
+      }
+    );
+
+    setUsers(users);
   };
 
   useEffect(() => {
     resetState();
     searchBlogs({ page: 1, create_new_arr: true });
+    fetchUsers();
   }, [query]);
 
   return (

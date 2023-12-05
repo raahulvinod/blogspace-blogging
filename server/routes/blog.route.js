@@ -5,6 +5,7 @@ import {
   latestBlogs,
   searchBlogCount,
   searchBlogs,
+  searchUsers,
   totalBlogCount,
   trendingBlogs,
 } from '../controllers/blog.controller.js';
@@ -19,5 +20,6 @@ router.post('/search-blogs', searchBlogs);
 router.post('/latest-blogs', latestBlogs);
 router.post('/all-latest-blog-count', totalBlogCount);
 router.post('/search-blog-count', searchBlogCount);
+router.post('/search-users', searchUsers);
 
 export default router;
