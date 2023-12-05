@@ -6,6 +6,7 @@ import UserAuth from './pages/UserAuth';
 import { lookInSession } from './utils/sessions';
 import Editor from './pages/Editor';
 import Home from './pages/Home';
+import SearchPage from './pages/SearchPage';
 
 export const UserContext = createContext({});
 
@@ -28,6 +29,7 @@ const App = () => {
           <Route index element={<Home />} />
           <Route path="signin" element={<UserAuth type="sign-in" />} />
           <Route path="signup" element={<UserAuth type="sign-up" />} />
+          <Route path="search/:query" element={<SearchPage />} />
         </Route>
       </Routes>
     </UserContext.Provider>

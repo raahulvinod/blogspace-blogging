@@ -1,5 +1,5 @@
 import { useContext, useState } from 'react';
-import { Link, Outlet } from 'react-router-dom';
+import { Link, Outlet, useNavigate } from 'react-router-dom';
 import { IoSearchOutline } from 'react-icons/io5';
 
 import logo from '../images/blog.png';
@@ -14,9 +14,19 @@ const Navbar = () => {
   const { userAuth = {}, setUserAuth } = useContext(UserContext);
   const { access_token, profile_img, username } = userAuth;
 
+  const navigate = useNavigate();
+
   const signOutUser = () => {
     removeFromSession('user');
     setUserAuth({ access_token: null });
+  };
+
+  const handleSearch = (e) => {
+    let query = e.target.value;
+
+    if (e.keyCode === 13 && query.length) {
+      navigate(`/search/${query}`);
+    }
   };
 
   return (
@@ -35,6 +45,7 @@ const Navbar = () => {
             type="text"
             placeholder="Search"
             className="w-full md:w-auto bg-grey p-4 pl-6 pr-[12%] md:pr-6 rounded-full placeholder:text-dark-grey md:pl-12"
+            onKeyDown={handleSearch}
           />
           <IoSearchOutline className="absolute right-[10%] md:pointer-events-none md:left-5 top-1/2 -translate-y-1/2 text-2xl text-dark-grey" />
         </div>
