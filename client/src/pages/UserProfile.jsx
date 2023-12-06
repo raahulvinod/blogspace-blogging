@@ -11,6 +11,7 @@ import InpageNavigation from '../components/InpageNavigation';
 import BlogPostCard from '../components/BlogPostCard';
 import NoData from '../components/NoData';
 import LoadMoreButton from '../components/LoadMoreButton';
+import PageNotFound from './404Page';
 
 export const profileDataStructure = {
   personal_info: {
@@ -33,6 +34,7 @@ const UserProfile = () => {
   const [profile, setProfile] = useState(profileDataStructure);
   const [loading, setLoading] = useState(true);
   const [blogs, setBlogs] = useState(null);
+  const [profileLoaded, setProfileLoaded] = useState('');
 
   const {
     personal_info: { fullname, username: profile_username, profile_img, bio },
@@ -69,29 +71,38 @@ const UserProfile = () => {
       import.meta.env.VITE_SERVER_DOMAIN + '/get-profile',
       { username: profileId }
     );
-
-    setProfile(user);
-    getBlogs({ user_id: user._id });
+    if (user !== null) {
+      setProfile(user);
+      getBlogs({ user_id: user._id });
+    }
+    setProfileLoaded(profileId);
     setLoading(false);
   };
 
   useEffect(() => {
-    resetState();
-    fetchUserProfile(UserContext);
-  }, [profileId]);
+    if (profileId !== profileLoaded) {
+      setBlogs(null);
+    }
+
+    if (blogs === null) {
+      resetState();
+      fetchUserProfile();
+    }
+  }, [profileId, blogs]);
 
   const resetState = () => {
     setProfile(profileDataStructure);
     setLoading(true);
+    setProfileLoaded('');
   };
 
   return (
     <AnimationWrapper>
       {loading ? (
         <Loader />
-      ) : (
+      ) : profile_username.length ? (
         <section className="h-cover md:flex flex-row-reverse items-start gap-5 min-[1100px]:gap-12">
-          <div className="flex flex-col max-md:items-center gap-5 min-w-[250px]">
+          <div className="flex flex-col max-md:items-center gap-5 min-w-[250px] md:w-[50%] md:pl-8 md:border-l border-grey md:sticky md:top-[100px] md:py-10">
             <img
               src={profile_img}
               className="w-48 h-48 bg-grey rounded-full md:w-32 md:h-32"
@@ -158,6 +169,8 @@ const UserProfile = () => {
             </InpageNavigation>
           </div>
         </section>
+      ) : (
+        <PageNotFound />
       )}
     </AnimationWrapper>
   );
