@@ -8,6 +8,7 @@ import LoadMoreButton from '../components/LoadMoreButton';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { filterPagination } from '../utils/filterPagination';
+import UserCard from '../components/UserCard';
 
 const SearchPage = () => {
   const { query } = useParams();
@@ -35,20 +36,14 @@ const SearchPage = () => {
     setBlogs(formatedData);
   };
 
-  const resetState = () => {
-    setBlogs(null);
-    setUsers(null);
-  };
-
   const fetchUsers = async () => {
-    const { data: users } = await axios.post(
+    const { data } = await axios.post(
       import.meta.env.VITE_SERVER_DOMAIN + '/search-users',
       {
         query,
       }
     );
-
-    setUsers(users);
+    setUsers(data.users);
   };
 
   useEffect(() => {
@@ -56,6 +51,34 @@ const SearchPage = () => {
     searchBlogs({ page: 1, create_new_arr: true });
     fetchUsers();
   }, [query]);
+
+  const resetState = () => {
+    setBlogs(null);
+    setUsers(null);
+  };
+
+  const UserCardWrapper = () => {
+    return (
+      <>
+        {users == null ? (
+          <Loader />
+        ) : users.length ? (
+          users.map((user, i) => {
+            return (
+              <AnimationWrapper
+                key={i}
+                transition={{ duration: 1, delay: i * 0.08 }}
+              >
+                <UserCard user={user} />
+              </AnimationWrapper>
+            );
+          })
+        ) : (
+          <NoData message="No user found" />
+        )}
+      </>
+    );
+  };
 
   return (
     <section className="h-cover flex justify-center gap-10 ">
@@ -84,7 +107,16 @@ const SearchPage = () => {
             )}
             <LoadMoreButton state={blogs} fetchData={searchBlogs} />
           </>
+
+          <UserCardWrapper />
         </InpageNavigation>
+      </div>
+
+      <div className="min-w-[40%] lg:min-w-[350px] max-w-min border-1 border-grey pl-8 pt-3 max-md:hidden">
+        <h1 className="font-medium text-xl mb-8">
+          User related to search <i className="fi fi-rr-user mt-1"></i>
+        </h1>
+        <UserCardWrapper />
       </div>
     </section>
   );
