@@ -6,6 +6,11 @@ import AnimationWrapper from '../utils/animation';
 import { Loader } from '../components/Loader';
 import { UserContext } from '../App';
 import AboutUser from '../components/AboutUser';
+import { filterPagination } from '../utils/filterPagination';
+import InpageNavigation from '../components/InpageNavigation';
+import BlogPostCard from '../components/BlogPostCard';
+import NoData from '../components/NoData';
+import LoadMoreButton from '../components/LoadMoreButton';
 
 export const profileDataStructure = {
   personal_info: {
@@ -27,6 +32,7 @@ const UserProfile = () => {
 
   const [profile, setProfile] = useState(profileDataStructure);
   const [loading, setLoading] = useState(true);
+  const [blogs, setBlogs] = useState(null);
 
   const {
     personal_info: { fullname, username: profile_username, profile_img, bio },
@@ -37,6 +43,27 @@ const UserProfile = () => {
 
   const { userAuth: { username } = {} } = useContext(UserContext);
 
+  const getBlogs = async ({ page = 1, user_id }) => {
+    user_id = user_id == undefined ? blogs.user_id : user_id;
+
+    const { data } = await axios.post(
+      import.meta.env.VITE_SERVER_DOMAIN + '/search-blogs',
+      { author: user_id, page }
+    );
+
+    let formattedData = await filterPagination({
+      state: blogs,
+      data: data.blogs,
+      page,
+      countRoute: '/search-blog-count',
+      data_to_send: { author: user_id },
+    });
+
+    formattedData.user_id = user_id;
+
+    setBlogs(formattedData);
+  };
+
   const fetchUserProfile = async () => {
     const { data: user } = await axios.post(
       import.meta.env.VITE_SERVER_DOMAIN + '/get-profile',
@@ -44,6 +71,7 @@ const UserProfile = () => {
     );
 
     setProfile(user);
+    getBlogs({ user_id: user._id });
     setLoading(false);
   };
 
@@ -94,6 +122,40 @@ const UserProfile = () => {
               joinedAt={joinedAt}
               className="max-md:hidden"
             />
+          </div>
+
+          <div className="max-md:mt-12 w-full">
+            <InpageNavigation
+              routes={['Blogs published', 'About']}
+              defaultHidden={['About']}
+            >
+              <>
+                {blogs == null ? (
+                  <Loader />
+                ) : blogs.results.length ? (
+                  blogs.results.map((blog, i) => (
+                    <AnimationWrapper
+                      transition={{ duration: 1, delay: i * 0.1 }}
+                      key={i}
+                    >
+                      <BlogPostCard
+                        content={blog}
+                        author={blog.author.personal_info}
+                      />
+                    </AnimationWrapper>
+                  ))
+                ) : (
+                  <NoData message="No blogs published" />
+                )}
+                <LoadMoreButton state={blogs} fetchData={getBlogs} />
+              </>
+
+              <AboutUser
+                bio={bio}
+                socialLinks={social_links}
+                joinedAt={joinedAt}
+              />
+            </InpageNavigation>
           </div>
         </section>
       )}

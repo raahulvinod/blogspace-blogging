@@ -145,7 +145,7 @@ export const trendingBlogs = asyncHandler(async (req, res) => {
 // Search blogs
 export const searchBlogs = asyncHandler(async (req, res) => {
   try {
-    const { tag, query, page } = req.body;
+    const { tag, query, page, author } = req.body;
 
     let findQuery;
 
@@ -153,6 +153,8 @@ export const searchBlogs = asyncHandler(async (req, res) => {
       findQuery = { tags: tag, draft: false };
     } else if (query) {
       findQuery = { title: new RegExp(query, 'i'), draft: false };
+    } else if (author) {
+      findQuery = { author, draft: false };
     }
 
     const maxLimit = 2;
@@ -175,13 +177,15 @@ export const searchBlogs = asyncHandler(async (req, res) => {
 
 export const searchBlogCount = asyncHandler(async (req, res) => {
   try {
-    const { tag, query } = req.body;
+    const { tag, query, author } = req.body;
     let findQuery;
 
     if (tag) {
       findQuery = { tags: tag, draft: false };
     } else if (query) {
       findQuery = { title: new RegExp(query, 'i'), draft: false };
+    } else if (author) {
+      findQuery = { author, draft: false };
     }
 
     const count = await Blog.countDocuments(findQuery);
