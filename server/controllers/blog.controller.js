@@ -220,7 +220,7 @@ export const getBlog = asyncHandler(async (req, res) => {
       { $inc: { 'account_info.total_reads': incrementVal } }
     );
 
-    return res.status(200).json(blog);
+    return res.status(200).json({ blog });
   } catch (error) {
     throw error;
   }
