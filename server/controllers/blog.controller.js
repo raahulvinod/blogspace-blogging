@@ -144,9 +144,9 @@ export const trendingBlogs = asyncHandler(async (req, res) => {
 
 // Search blogs
 export const searchBlogs = asyncHandler(async (req, res) => {
-  try {
-    const { tag, query, page, author, limit, eliminateBlog } = req.body;
+  const { tag, query, page, author, limit, eliminateBlog } = req.body;
 
+  try {
     let findQuery;
 
     if (tag) {

@@ -46,21 +46,22 @@ const Blog = () => {
 
       setBlog(blog);
 
-      const { data } = await axios.post(
-        import.meta.env.VITE_SERVER_DOMAIN + '/search-blogs',
-        {
-          tag: blog.tags[0],
-          limit: 6,
-          eliminateBlog: blogId,
-        }
-      );
+      if (blog.tags && blog.tags.length > 0) {
+        const { data } = await axios.post(
+          import.meta.env.VITE_SERVER_DOMAIN + '/search-blogs',
+          {
+            tag: blog.tags[0],
+            limit: 6,
+            eliminateBlog: blogId,
+          }
+        );
 
-      setSimilarBlogs(data.blogs);
-      console.log(data.blogs);
+        setSimilarBlogs(data.blogs);
+      }
 
       setLoading(false);
     } catch (error) {
-      console.log(error);
+      console.log('Error fetching blog:', error);
       setLoading(false);
     }
   };
@@ -109,7 +110,7 @@ const Blog = () => {
 
               <BlogInteraction />
 
-              {similarBlogs !== null && similarBlogs.length && (
+              {similarBlogs !== null && similarBlogs.length ? (
                 <>
                   <h1 className="text-2xl mt-14 mb-10 font-medium">
                     Similar blogs
@@ -129,6 +130,8 @@ const Blog = () => {
                     );
                   })}
                 </>
+              ) : (
+                ''
               )}
             </div>
           </div>
