@@ -196,20 +196,31 @@ export const searchBlogCount = asyncHandler(async (req, res) => {
   }
 });
 
-// Search users
-export const searchUsers = asyncHandler(async (req, res) => {
+// Get blogs
+export const getBlog = asyncHandler(async (req, res) => {
+  const { blogId } = req.body;
+
   try {
-    const { query } = req.body;
+    const incrementVal = 1;
 
-    const users = await User.find({
-      'personal_info.username': new RegExp(query, 'i'),
-    })
-      .limit(50)
-      .select(
-        'personal_info.fullname personal_info.username personal_info.profile_img -_id'
-      );
+    const blog = await Blog.findOneAndUpdate(
+      { blog_id: blogId },
+      { $inc: { 'activity.total_reads': incrementVal } }
+    )
+      .populate(
+        'author',
+        'personal_info.fullname personal_info.username personal_info.profile_img'
+      )
+      .select('title des content banner activity publishedAt blog_id tags');
 
-    res.status(200).json({ users });
+    await User.findOneAndUpdate(
+      {
+        'personal_info.username': blog.author.personal_info.username,
+      },
+      { $inc: { 'account_info.total_reads': incrementVal } }
+    );
+
+    return res.status(200).json(blog);
   } catch (error) {
     throw error;
   }
