@@ -145,19 +145,19 @@ export const trendingBlogs = asyncHandler(async (req, res) => {
 // Search blogs
 export const searchBlogs = asyncHandler(async (req, res) => {
   try {
-    const { tag, query, page, author } = req.body;
+    const { tag, query, page, author, limit, eliminateBlog } = req.body;
 
     let findQuery;
 
     if (tag) {
-      findQuery = { tags: tag, draft: false };
+      findQuery = { tags: tag, draft: false, blog_id: { $ne: eliminateBlog } };
     } else if (query) {
       findQuery = { title: new RegExp(query, 'i'), draft: false };
     } else if (author) {
       findQuery = { author, draft: false };
     }
 
-    const maxLimit = 2;
+    const maxLimit = limit ? limit : 2;
 
     const blogs = await Blog.find(findQuery)
       .populate(
