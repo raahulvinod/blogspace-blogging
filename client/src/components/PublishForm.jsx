@@ -1,5 +1,5 @@
 import toast, { Toaster } from 'react-hot-toast';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import AnimationWrapper from '../utils/animation';
 import { useContext, useState } from 'react';
 import { EditorContext } from '../pages/Editor';
@@ -22,6 +22,7 @@ const PublishForm = () => {
 
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
+  const { blogId } = useParams();
 
   let characterLimit = 200;
   let tagLimit = 10;
@@ -98,7 +99,7 @@ const PublishForm = () => {
 
       await axios.post(
         import.meta.env.VITE_SERVER_DOMAIN + '/create-blog',
-        blogData,
+        { ...blogData, id: blogId },
         {
           headers: {
             Authorization: `Bearer ${access_token}`,

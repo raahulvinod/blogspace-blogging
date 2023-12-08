@@ -20,7 +20,7 @@ export const getUploadURL = asyncHandler(async (req, res) => {
 export const createBlog = asyncHandler(async (req, res) => {
   const authorId = req.user;
 
-  let { title, banner, content, tags, des, draft } = req.body;
+  let { title, banner, content, tags, des, draft, id } = req.body;
 
   if (!title || !title.length) {
     return res.status(403).json({ error: 'Title is required.' });
@@ -53,37 +53,59 @@ export const createBlog = asyncHandler(async (req, res) => {
   tags = tags.map((tag) => tag.toLowerCase());
 
   const blog_id =
+    id ||
     title
       .replace(/[^a-zA-Z0-9]/g, ' ')
       .replace(/\s+/g, '-')
       .trim() + nanoid();
 
-  const isDraft = Boolean(draft);
+  try {
+    if (id) {
+      const blog = await Blog.findOneAndUpdate(
+        { blog_id },
+        {
+          title,
+          des,
+          banner,
+          content,
+          tags,
+          blog_id,
+          draft: draft ? draft : false,
+        }
+      );
 
-  const blog = new Blog({
-    title,
-    des,
-    banner,
-    content,
-    tags,
-    author: authorId,
-    blog_id,
-    draft: isDraft,
-  });
+      return res.status(200).json({ id: blog.blog_id });
+    } else {
+      const isDraft = Boolean(draft);
 
-  await blog.save();
+      const blog = new Blog({
+        title,
+        des,
+        banner,
+        content,
+        tags,
+        author: authorId,
+        blog_id,
+        draft: isDraft,
+      });
 
-  const incrementVal = isDraft ? 0 : 1;
+      await blog.save();
 
-  const user = await User.findOneAndUpdate(
-    { _id: authorId },
-    {
-      $inc: { 'account_info.total_posts': incrementVal },
-      $push: { blogs: blog._id },
+      const incrementVal = isDraft ? 0 : 1;
+
+      const user = await User.findOneAndUpdate(
+        { _id: authorId },
+        {
+          $inc: { 'account_info.total_posts': incrementVal },
+          $push: { blogs: blog._id },
+        }
+      );
+
+      return res.status(200).json({ id: blog.blog_id });
     }
-  );
-
-  return res.status(200).json({ id: blog.blog_id });
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
 });
 
 // Get latest blogs
@@ -198,10 +220,10 @@ export const searchBlogCount = asyncHandler(async (req, res) => {
 
 // Get blogs
 export const getBlog = asyncHandler(async (req, res) => {
-  const { blogId } = req.body;
+  const { blogId, draft, mode } = req.body;
 
   try {
-    const incrementVal = 1;
+    const incrementVal = mode !== 'edit' ? 1 : 0;
 
     const blog = await Blog.findOneAndUpdate(
       { blog_id: blogId },
@@ -219,6 +241,10 @@ export const getBlog = asyncHandler(async (req, res) => {
       },
       { $inc: { 'account_info.total_reads': incrementVal } }
     );
+
+    if (blog.draft && !draft) {
+      return res.status(500).json({ error: 'You can not access draft blogs.' });
+    }
 
     return res.status(200).json({ blog });
   } catch (error) {
