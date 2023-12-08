@@ -85,7 +85,7 @@ const Blog = () => {
         <Loader />
       ) : (
         <BlogContext.Provider value={{ blog, setBlog }}>
-          <div className="max-w-[900px] center py-10 max-lg:px-5vw">
+          <div className="max-w-[900px] center py-10 max-lg:px-[5vw]">
             <img src={banner} className="aspect-video" />
 
             <div className="mt-12">
