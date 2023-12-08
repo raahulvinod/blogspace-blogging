@@ -7,6 +7,7 @@ import { Loader } from '../components/Loader';
 import { getDay } from '../utils/date';
 import BlogInteraction from '../components/BlogInteraction';
 import BlogPostCard from '../components/BlogPostCard';
+import BlogContent from '../components/Blogcontent';
 
 export const blogStructure = {
   title: '',
@@ -45,6 +46,7 @@ const Blog = () => {
       });
 
       setBlog(blog);
+      console.log(blog.content);
 
       if (blog.tags && blog.tags.length > 0) {
         const { data } = await axios.post(
@@ -107,6 +109,15 @@ const Blog = () => {
               <BlogInteraction />
 
               {/* Blog content */}
+              <div className="my-12 font-gelasio blog-page-content">
+                {content[0].blocks.map((block, i) => {
+                  return (
+                    <div key={i} className="my-4 md:my-8">
+                      <BlogContent block={block} />
+                    </div>
+                  );
+                })}
+              </div>
 
               <BlogInteraction />
 
