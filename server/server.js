@@ -1,6 +1,7 @@
 import express from 'express';
 import 'dotenv/config';
 import cors from 'cors';
+import morgan from 'morgan';
 
 import connectDb from './config/dbConnect.js';
 import authRouter from './routes/auth.route.js';
@@ -16,6 +17,7 @@ const PORT = process.env.PORT || 4000;
 connectDb();
 
 app.use(express.json());
+app.use(morgan('dev'));
 app.use(cors());
 
 // Routes

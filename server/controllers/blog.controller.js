@@ -4,6 +4,7 @@ import { nanoid } from 'nanoid';
 import { generateUploadURL } from '../services/bucket.service.js';
 import Blog from '../models/blog.model.js';
 import User from '../models/user.model.js';
+import Notification from '../models/notification.model.js';
 
 // Get upload url
 export const getUploadURL = asyncHandler(async (req, res) => {
@@ -247,6 +248,45 @@ export const getBlog = asyncHandler(async (req, res) => {
     }
 
     return res.status(200).json({ blog });
+  } catch (error) {
+    throw error;
+  }
+});
+
+// Like blog
+export const likeBlog = asyncHandler(async (req, res) => {
+  const userId = req.user;
+
+  const { _id, isLikedByUser } = req.body;
+
+  let incrementVal = !isLikedByUser ? 1 : -1;
+
+  try {
+    const blog = await Blog.findOneAndUpdate(
+      { _id },
+      { $inc: { 'activity.total_likes': incrementVal } }
+    );
+
+    if (!isLikedByUser) {
+      let like = new Notification({
+        type: 'like',
+        blog: _id,
+        notification_for: blog.author,
+        user: userId,
+      });
+
+      await like.save();
+
+      res.status(200).json({ likedByUser: true });
+    } else {
+      await Notification.findOneAndDelete({
+        user: userId,
+        type: 'like',
+        blog: _id,
+      });
+
+      return res.status(200).json({ likedByUser: false });
+    }
   } catch (error) {
     throw error;
   }

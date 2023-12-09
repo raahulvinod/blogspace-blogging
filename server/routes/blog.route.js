@@ -4,6 +4,7 @@ import {
   getBlog,
   getUploadURL,
   latestBlogs,
+  likeBlog,
   searchBlogCount,
   searchBlogs,
   totalBlogCount,
@@ -21,5 +22,6 @@ router.post('/latest-blogs', latestBlogs);
 router.post('/all-latest-blog-count', totalBlogCount);
 router.post('/search-blog-count', searchBlogCount);
 router.post('/get-blog', getBlog);
+router.post('/like-blog', verifyToken, likeBlog);
 
 export default router;

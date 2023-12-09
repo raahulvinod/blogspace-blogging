@@ -1,5 +1,6 @@
 import asyncHandler from 'express-async-handler';
 import User from '../models/user.model.js';
+import Notification from '../models/notification.model.js';
 
 export const getUserProfile = asyncHandler(async (req, res) => {
   const { username } = req.body;
@@ -29,6 +30,24 @@ export const searchUsers = asyncHandler(async (req, res) => {
       );
 
     res.status(200).json({ users });
+  } catch (error) {
+    throw error;
+  }
+});
+
+export const isLikedByUser = asyncHandler(async (req, res) => {
+  const userId = req.user;
+
+  const { _id } = req.body;
+
+  try {
+    const result = await Notification.exists({
+      user: userId,
+      type: 'like',
+      blog: _id,
+    });
+
+    return res.status(200).json({ result });
   } catch (error) {
     throw error;
   }
