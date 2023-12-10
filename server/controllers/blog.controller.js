@@ -5,6 +5,7 @@ import { generateUploadURL } from '../services/bucket.service.js';
 import Blog from '../models/blog.model.js';
 import User from '../models/user.model.js';
 import Notification from '../models/notification.model.js';
+import Comment from '../models/comment.model.js';
 
 // Get upload url
 export const getUploadURL = asyncHandler(async (req, res) => {
@@ -287,6 +288,60 @@ export const likeBlog = asyncHandler(async (req, res) => {
 
       return res.status(200).json({ likedByUser: false });
     }
+  } catch (error) {
+    throw error;
+  }
+});
+
+// Add comment
+export const addComment = asyncHandler(async (req, res) => {
+  try {
+    const userId = req.user;
+
+    const { _id, comment, blog_author } = req.body;
+
+    if (!comment.length) {
+      return res
+        .status(403)
+        .json({ error: 'Write something to leave a comment' });
+    }
+
+    const commentData = new Comment({
+      blog_id: _id,
+      blog_author,
+      comment,
+      commented_by: userId,
+    });
+
+    const commentFile = await commentData.save();
+
+    const { comment: comments, commentedAt, children } = commentFile;
+
+    const blog = await Blog.findOneAndUpdate(
+      { _id },
+      {
+        $push: { comments: commentFile._id },
+        $inc: { 'activity.total_comments': 1 },
+        'activity.total_parent_comments': 1,
+      },
+      { new: true }
+    );
+
+    new Notification({
+      type: 'comment',
+      blog: _id,
+      notification_for: blog.author,
+      user: userId,
+      comment: commentFile._id,
+    }).save();
+
+    return res.status(200).json({
+      comments,
+      commentedAt,
+      _id: commentFile._id,
+      userId,
+      children,
+    });
   } catch (error) {
     throw error;
   }

@@ -1,5 +1,6 @@
 import express from 'express';
 import {
+  addComment,
   createBlog,
   getBlog,
   getUploadURL,
@@ -23,5 +24,6 @@ router.post('/all-latest-blog-count', totalBlogCount);
 router.post('/search-blog-count', searchBlogCount);
 router.post('/get-blog', getBlog);
 router.post('/like-blog', verifyToken, likeBlog);
+router.post('/add-comment', verifyToken, addComment);
 
 export default router;
