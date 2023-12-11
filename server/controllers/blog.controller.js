@@ -346,3 +346,31 @@ export const addComment = asyncHandler(async (req, res) => {
     throw error;
   }
 });
+
+// Get blog comments
+export const getBlogComments = asyncHandler(async (req, res) => {
+  try {
+    const { blogId, skip } = req.body;
+
+    let maxLimit = 5;
+
+    const comments = await Comment.find({
+      blog_id: blogId,
+      isReply: false,
+    })
+      .populate(
+        'commented_by',
+        'personal_info.fullname personal_info.profile_img personal_info.username'
+      )
+      .skip(skip)
+      .limit(maxLimit)
+      .sort({
+        commentedAt: -1,
+      });
+    console.log(comments);
+
+    return res.status(200).json(comments);
+  } catch (error) {
+    throw error;
+  }
+});

@@ -5,6 +5,42 @@ import axios from 'axios';
 
 import { BlogContext } from '../pages/Blog';
 
+export const fetchComments = async ({
+  skip = 0,
+  blogId,
+  setParentCommentCountFun,
+  commentArray = null,
+}) => {
+  let res;
+
+  try {
+    const { data } = await axios.post(
+      import.meta.env.VITE_SERVER_DOMAIN + '/get-blog-comments',
+      { skip, blogId }
+    );
+
+    console.log('data', data);
+
+    if (data) {
+      data.map((comment) => {
+        comment.childrenLevel = 0;
+      });
+
+      setParentCommentCountFun((preVal) => preVal + data.length);
+
+      if (commentArray == null) {
+        res = { results: data };
+      } else {
+        res = { results: [...commentArray, ...data] };
+      }
+    }
+
+    return res;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 const CommentField = ({ action }) => {
   const [comment, setComment] = useState('');
 

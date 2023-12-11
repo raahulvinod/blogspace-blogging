@@ -9,6 +9,7 @@ import BlogInteraction from '../components/BlogInteraction';
 import BlogPostCard from '../components/BlogPostCard';
 import BlogContent from '../components/Blogcontent';
 import CommentsContainer from '../components/CommentsContainer';
+import { fetchComments } from '../components/CommentField';
 
 export const blogStructure = {
   title: '',
@@ -49,7 +50,13 @@ const Blog = () => {
         blogId,
       });
 
+      blog.comments = await fetchComments({
+        blogId: blog._id,
+        setParentCommentCountFun: setTotalParentCommentsLoaded,
+      });
+
       setBlog(blog);
+      console.log(blog);
 
       if (blog.tags && blog.tags.length > 0) {
         const { data } = await axios.post(
