@@ -321,8 +321,10 @@ export const addComment = asyncHandler(async (req, res) => {
       { _id },
       {
         $push: { comment: commentFile._id },
-        $inc: { 'activity.total_comments': 1 },
-        'activity.total_parent_comments': 1,
+        $inc: {
+          'activity.total_comments': 1,
+          'activity.total_parent_comments': 1,
+        },
       },
       { new: true }
     );

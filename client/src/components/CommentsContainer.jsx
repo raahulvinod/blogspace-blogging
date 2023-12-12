@@ -4,15 +4,18 @@ import CommentField from './CommentField';
 import NoData from './NoData';
 import AnimationWrapper from '../utils/animation';
 import CommentCard from './CommentCard';
+import { Loader } from './Loader';
 
 const CommentsContainer = () => {
   const {
     blog: {
       title,
       comments: { results: commentsArr },
+      activity: { total_parent_comments },
     },
     commentsWrapper,
     setCommentsWrapper,
+    totalParentCommentsLoaded,
   } = useContext(BlogContext);
 
   return (
@@ -51,6 +54,12 @@ const CommentsContainer = () => {
         })
       ) : (
         <NoData message="No comments" />
+      )}
+
+      {total_parent_comments > totalParentCommentsLoaded ? (
+        <button>Load more</button>
+      ) : (
+        ''
       )}
     </div>
   );
