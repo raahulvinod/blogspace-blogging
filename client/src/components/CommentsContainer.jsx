@@ -1,6 +1,6 @@
 import { useContext } from 'react';
 import { BlogContext } from '../pages/Blog';
-import CommentField from './CommentField';
+import CommentField, { fetchComments } from './CommentField';
 import NoData from './NoData';
 import AnimationWrapper from '../utils/animation';
 import CommentCard from './CommentCard';
@@ -8,15 +8,30 @@ import { Loader } from './Loader';
 
 const CommentsContainer = () => {
   const {
+    blog,
     blog: {
+      _id,
       title,
       comments: { results: commentsArr },
       activity: { total_parent_comments },
     },
+    setBlog,
     commentsWrapper,
     setCommentsWrapper,
     totalParentCommentsLoaded,
+    setTotalParentCommentsLoaded,
   } = useContext(BlogContext);
+
+  const loadMoreComments = async () => {
+    const newCommentsArray = await fetchComments({
+      skip: totalParentCommentsLoaded,
+      blogId: _id,
+      setParentCommentCountFun: setTotalParentCommentsLoaded,
+      commentArray: commentsArr,
+    });
+
+    setBlog({ ...blog, comments: newCommentsArray });
+  };
 
   return (
     <div
@@ -57,7 +72,12 @@ const CommentsContainer = () => {
       )}
 
       {total_parent_comments > totalParentCommentsLoaded ? (
-        <button>Load more</button>
+        <button
+          onClick={loadMoreComments}
+          className="text-dark-grey p-2 px-3 hover:bg-grey/30 rounded-md flex items-center gap-2"
+        >
+          Load more
+        </button>
       ) : (
         ''
       )}
