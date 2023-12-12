@@ -1,10 +1,16 @@
 import { useContext } from 'react';
 import { BlogContext } from '../pages/Blog';
 import CommentField from './CommentField';
+import NoData from './NoData';
+import AnimationWrapper from '../utils/animation';
+import CommentCard from './CommentCard';
 
 const CommentsContainer = () => {
   const {
-    blog: { title },
+    blog: {
+      title,
+      comments: { results: commentsArr },
+    },
     commentsWrapper,
     setCommentsWrapper,
   } = useContext(BlogContext);
@@ -30,6 +36,22 @@ const CommentsContainer = () => {
       <hr className="border-grey my-8 w-[120%] -ml-10" />
 
       <CommentField action="comment" />
+
+      {commentsArr && commentsArr.length ? (
+        commentsArr.map((comment, i) => {
+          return (
+            <AnimationWrapper key={i}>
+              <CommentCard
+                index={i}
+                leftValue={comment.childrenLevel * 4}
+                commentData={comment}
+              />
+            </AnimationWrapper>
+          );
+        })
+      ) : (
+        <NoData message="No comments" />
+      )}
     </div>
   );
 };

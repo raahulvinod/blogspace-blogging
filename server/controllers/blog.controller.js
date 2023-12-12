@@ -298,9 +298,9 @@ export const addComment = asyncHandler(async (req, res) => {
   try {
     const userId = req.user;
 
-    const { _id, comment, blog_author } = req.body;
+    const { _id, comment: comments, blog_author } = req.body;
 
-    if (!comment.length) {
+    if (!comments.length) {
       return res
         .status(403)
         .json({ error: 'Write something to leave a comment' });
@@ -309,18 +309,18 @@ export const addComment = asyncHandler(async (req, res) => {
     const commentData = new Comment({
       blog_id: _id,
       blog_author,
-      comment,
+      comment: comments,
       commented_by: userId,
     });
 
     const commentFile = await commentData.save();
 
-    const { comment: comments, commentedAt, children } = commentFile;
+    const { comment, commentedAt, children } = commentFile;
 
     const blog = await Blog.findOneAndUpdate(
       { _id },
       {
-        $push: { comments: commentFile._id },
+        $push: { comment: commentFile._id },
         $inc: { 'activity.total_comments': 1 },
         'activity.total_parent_comments': 1,
       },
@@ -336,7 +336,7 @@ export const addComment = asyncHandler(async (req, res) => {
     }).save();
 
     return res.status(200).json({
-      comments,
+      comment,
       commentedAt,
       _id: commentFile._id,
       userId,

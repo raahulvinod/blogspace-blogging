@@ -19,8 +19,6 @@ export const fetchComments = async ({
       { skip, blogId }
     );
 
-    console.log('data', data);
-
     if (data) {
       data.map((comment) => {
         comment.childrenLevel = 0;
@@ -54,6 +52,7 @@ const CommentField = ({ action }) => {
       _id,
       author: { _id: blog_author },
       comments,
+      comments: { results: commentsArr },
       activity,
       activity: { total_comments, total_parent_comments },
     },
@@ -83,13 +82,15 @@ const CommentField = ({ action }) => {
 
       setComment('');
 
-      data.commentedBy = { perosnal_info: { username, profile_img, fullname } };
+      data.commented_by = {
+        personal_info: { username, profile_img, fullname },
+      };
 
       let newCommentArr;
 
       data.childrenLevel = 0;
 
-      newCommentArr = [data];
+      newCommentArr = [data, ...commentsArr];
 
       let parentCommentIncrementVal = 1;
 
