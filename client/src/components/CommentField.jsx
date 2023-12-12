@@ -39,7 +39,12 @@ export const fetchComments = async ({
   }
 };
 
-const CommentField = ({ action }) => {
+const CommentField = ({
+  action,
+  index = undefined,
+  replyingTo = undefined,
+  setIsReplying,
+}) => {
   const [comment, setComment] = useState('');
 
   const {
@@ -72,7 +77,7 @@ const CommentField = ({ action }) => {
     try {
       const { data } = await axios.post(
         import.meta.env.VITE_SERVER_DOMAIN + '/add-comment',
-        { _id, comment, blog_author },
+        { _id, comment, blog_author, replying_to: replyingTo },
         {
           headers: {
             Authorization: `Bearer ${access_token}`,
@@ -88,11 +93,26 @@ const CommentField = ({ action }) => {
 
       let newCommentArr;
 
-      data.childrenLevel = 0;
+      if (replyingTo) {
+        commentsArr[index].children.push(data._id);
 
-      newCommentArr = [data, ...commentsArr];
+        data.childrenLevel = commentsArr[index].childrenLevel + 1;
+        data.parentIndex = index;
 
-      let parentCommentIncrementVal = 1;
+        commentsArr[index].isReplyLoaded = true;
+
+        commentsArr.splice(index + 1, 0, data);
+
+        newCommentArr = commentsArr;
+
+        setIsReplying(false);
+      } else {
+        data.childrenLevel = 0;
+
+        newCommentArr = [data, ...commentsArr];
+      }
+
+      let parentCommentIncrementVal = replyingTo ? 0 : 1;
 
       setBlog({
         ...blog,

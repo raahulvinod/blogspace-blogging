@@ -298,7 +298,7 @@ export const addComment = asyncHandler(async (req, res) => {
   try {
     const userId = req.user;
 
-    const { _id, comment: comments, blog_author } = req.body;
+    const { _id, comment: comments, blog_author, replying_to } = req.body;
 
     if (!comments.length) {
       return res
@@ -306,14 +306,18 @@ export const addComment = asyncHandler(async (req, res) => {
         .json({ error: 'Write something to leave a comment' });
     }
 
-    const commentData = new Comment({
+    let commentData = {
       blog_id: _id,
       blog_author,
       comment: comments,
       commented_by: userId,
-    });
+    };
 
-    const commentFile = await commentData.save();
+    if (replying_to) {
+      commentData.parent = replying_to;
+    }
+
+    const commentFile = await new Comment(commentData).save();
 
     const { comment, commentedAt, children } = commentFile;
 
@@ -323,19 +327,32 @@ export const addComment = asyncHandler(async (req, res) => {
         $push: { comment: commentFile._id },
         $inc: {
           'activity.total_comments': 1,
-          'activity.total_parent_comments': 1,
+          'activity.total_parent_comments': replying_to ? 0 : 1,
         },
       },
       { new: true }
     );
 
-    new Notification({
-      type: 'comment',
+    let notificationData = {
+      type: replying_to ? 'reply' : 'comment',
       blog: _id,
       notification_for: blog.author,
       user: userId,
       comment: commentFile._id,
-    }).save();
+    };
+
+    if (replying_to) {
+      notificationData.replied_on_comment = replying_to;
+
+      const replyingToComment = await Comment.findOneAndUpdate(
+        { _id: replying_to },
+        { $push: { children: commentFile._id } }
+      );
+
+      notificationData.notification_for = replyingToComment.commented_by;
+    }
+
+    new Notification(notificationData).save();
 
     return res.status(200).json({
       comment,
@@ -369,7 +386,6 @@ export const getBlogComments = asyncHandler(async (req, res) => {
       .sort({
         commentedAt: -1,
       });
-    console.log(comments);
 
     return res.status(200).json(comments);
   } catch (error) {
