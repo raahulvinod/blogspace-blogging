@@ -315,6 +315,7 @@ export const addComment = asyncHandler(async (req, res) => {
 
     if (replying_to) {
       commentData.parent = replying_to;
+      commentData.isReply = true;
     }
 
     const commentFile = await new Comment(commentData).save();
@@ -388,6 +389,36 @@ export const getBlogComments = asyncHandler(async (req, res) => {
       });
 
     return res.status(200).json(comments);
+  } catch (error) {
+    throw error;
+  }
+});
+
+// Get replies
+export const getReplies = asyncHandler(async (req, res) => {
+  try {
+    const { _id, skip } = req.body;
+
+    const maxLimit = 5;
+
+    const replies = await Comment.findOne({ _id })
+      .populate({
+        path: 'children',
+        option: {
+          limit: maxLimit,
+          skip: skip,
+          sort: { commentedAt: -1 },
+        },
+        populate: {
+          path: 'commented_by',
+          select:
+            'personal_info.fullname personal_info.profile_img personal_info.username',
+        },
+        select: '-blog_id -updatedAt',
+      })
+      .select('children');
+
+    return res.status(200).json({ replies: replies.children });
   } catch (error) {
     throw error;
   }

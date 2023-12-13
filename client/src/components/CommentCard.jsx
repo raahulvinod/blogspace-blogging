@@ -4,6 +4,7 @@ import { UserContext } from '../App';
 import toast from 'react-hot-toast';
 import CommentField from './CommentField';
 import { BlogContext } from '../pages/Blog';
+import axios from 'axios';
 
 const CommentCard = ({ index, leftValue, commentData }) => {
   const {
@@ -13,6 +14,7 @@ const CommentCard = ({ index, leftValue, commentData }) => {
     commentedAt,
     comment,
     _id,
+    children,
   } = commentData;
 
   const [isReplying, setIsReplying] = useState(false);
@@ -24,6 +26,7 @@ const CommentCard = ({ index, leftValue, commentData }) => {
   const {
     blog,
     blog: {
+      comments,
       comments: { results: commentsArr },
     },
     setBlog,
@@ -59,6 +62,36 @@ const CommentCard = ({ index, leftValue, commentData }) => {
     removeCommentsCards(index + 1);
   };
 
+  const loadReplies = async ({ skip = 0 }) => {
+    if (children.length) {
+      hideReplies();
+
+      try {
+        const {
+          data: { replies },
+        } = await axios.post(
+          import.meta.env.VITE_SERVER_DOMAIN + '/get-replies',
+          {
+            _id,
+            skip,
+          }
+        );
+
+        commentData.isReplyLoaded = true;
+
+        for (let i = 0; i < replies.length; i++) {
+          replies[i].childrenLevel = commentData.childrenLevel + 1;
+
+          commentsArr.splice(index + 1 + i + skip, 0, replies[i]);
+        }
+
+        setBlog({ ...blog, comments: { ...comments, results: commentsArr } });
+      } catch (error) {
+        console.log(error);
+      }
+    }
+  };
+
   return (
     <div className="w-full" style={{ paddingLeft: `${leftValue * 10}px` }}>
       <div className="my-5 p-6 rounded-md border border-grey">
@@ -84,7 +117,12 @@ const CommentCard = ({ index, leftValue, commentData }) => {
               <i className="fi fi-rs-comment-dots"></i> Hide Reply
             </button>
           ) : (
-            ''
+            <button
+              onClick={loadReplies}
+              className="text-dark-grey p-2 px-3 hover:bg-grey/30 rounded-md flex items-center gap-2"
+            >
+              <i className="fi fi-rs-comment-dots"></i> {children.length} Reply
+            </button>
           )}
           <button onClick={handleReply} className="underline">
             Reply

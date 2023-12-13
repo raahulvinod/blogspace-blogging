@@ -4,6 +4,7 @@ import {
   createBlog,
   getBlog,
   getBlogComments,
+  getReplies,
   getUploadURL,
   latestBlogs,
   likeBlog,
@@ -27,5 +28,6 @@ router.post('/get-blog', getBlog);
 router.post('/like-blog', verifyToken, likeBlog);
 router.post('/add-comment', verifyToken, addComment);
 router.post('/get-blog-comments', getBlogComments);
+router.post('/get-replies', getReplies);
 
 export default router;
