@@ -2,6 +2,7 @@ import express from 'express';
 import {
   addComment,
   createBlog,
+  deleteComment,
   getBlog,
   getBlogComments,
   getReplies,
@@ -29,5 +30,6 @@ router.post('/like-blog', verifyToken, likeBlog);
 router.post('/add-comment', verifyToken, addComment);
 router.post('/get-blog-comments', getBlogComments);
 router.post('/get-replies', getReplies);
+router.post('/delete-comment', verifyToken, deleteComment);
 
 export default router;
