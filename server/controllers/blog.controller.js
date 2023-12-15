@@ -429,21 +429,17 @@ const deleteComments = async (_id) => {
     const comment = await Comment.findOneAndDelete({ _id });
 
     if (comment.parent) {
-      const data = await Comment.findOneAndUpdate(
+      await Comment.findOneAndUpdate(
         { _id: comment.parent },
         { $pull: { children: _id } }
       );
-
-      console.log(data);
-      console.log('comment deleted');
     }
 
     await Notification.findOneAndDelete({ comment: _id });
-    console.log('comment notification deleted');
-    await Notification.findOneAndDelete({ reply: _id });
-    console.log('reply notification deleted');
 
-    const blog = await Blog.findOneAndUpdate(
+    await Notification.findOneAndDelete({ reply: _id });
+
+    await Blog.findOneAndUpdate(
       { _id: comment.blog_id },
       {
         $pull: { comments: _id },
@@ -454,7 +450,7 @@ const deleteComments = async (_id) => {
       }
     );
 
-    if (comment.children.length) {
+    if (comment?.children?.length) {
       comment.children.map((replies) => deleteComments(replies));
     }
   } catch (error) {
@@ -468,15 +464,14 @@ export const deleteComment = asyncHandler(async (req, res) => {
     const userId = req.user;
 
     const { _id } = req.body;
-    console.log('user id', userId);
-    console.log('_id', _id);
 
     const comment = await Comment.findOne({ _id });
 
-    console.log(comment);
-
-    if (userId === comment.commented_by || userId === comment.blog_author) {
-      await deleteComments(_id);
+    if (
+      userId === comment.commented_by.toString() ||
+      userId === comment.blog_author.toString()
+    ) {
+      deleteComments(_id);
       return res.status(200).json({ status: 'success' });
     } else {
       return res.status(200).json({ error: 'You cannot delete this comment.' });

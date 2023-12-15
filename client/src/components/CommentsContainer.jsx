@@ -1,10 +1,10 @@
 import { useContext } from 'react';
+
 import { BlogContext } from '../pages/Blog';
 import CommentField, { fetchComments } from './CommentField';
 import NoData from './NoData';
 import AnimationWrapper from '../utils/animation';
 import CommentCard from './CommentCard';
-import { Loader } from './Loader';
 
 const CommentsContainer = () => {
   const {

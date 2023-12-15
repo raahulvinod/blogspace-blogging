@@ -78,7 +78,6 @@ const CommentCard = ({ index, leftValue, commentData }) => {
 
     if (isDelete) {
       let parentIndex = getParentIndex();
-      console.log('parent index', parentIndex);
 
       if (parentIndex !== undefined) {
         commentsArr[parentIndex].children = commentsArr[
@@ -93,7 +92,7 @@ const CommentCard = ({ index, leftValue, commentData }) => {
       commentsArr.splice(index, 1);
     }
 
-    if (commentData.childrenLevel == 0 && isDelete) {
+    if (commentData.childrenLevel === 0 && isDelete) {
       setTotalParentCommentsLoaded((preVal) => preVal - 1);
     }
 
@@ -104,7 +103,7 @@ const CommentCard = ({ index, leftValue, commentData }) => {
         ...activity,
         total_parent_comments:
           total_parent_comments -
-          (commentData.childrenLevel == 0 && isDelete ? 1 : 0),
+          (commentData.childrenLevel === 0 && isDelete ? 1 : 0),
       },
     });
   };
@@ -159,7 +158,7 @@ const CommentCard = ({ index, leftValue, commentData }) => {
         }
       );
 
-      console.log(data);
+      console.log('delete comment result', data);
 
       e.target.removeAttribute('disabled', false);
       removeCommentsCards(index + 1, true);
