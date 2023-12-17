@@ -31,7 +31,7 @@ const Navbar = () => {
 
   return (
     <>
-      <nav className="navbar">
+      <nav className="navbar z-50">
         <Link to="/" className="flex-none w-12">
           <img src={logo} alt="logo" className="w-full" />
         </Link>
@@ -50,11 +50,11 @@ const Navbar = () => {
           <IoSearchOutline className="absolute right-[10%] md:pointer-events-none md:left-5 top-1/2 -translate-y-1/2 text-2xl text-dark-grey" />
         </div>
 
-        <div
-          className="flex items-center gap-3 md:gap-6 ml-auto"
-          onClick={() => setSearchBoxVisibility((currentVal) => !currentVal)}
-        >
-          <button className="md:hidden bg-grey w-12 h-12 rounded-full flex items-center justify-center">
+        <div className="flex items-center gap-3 md:gap-6 ml-auto">
+          <button
+            onClick={() => setSearchBoxVisibility((currentVal) => !currentVal)}
+            className="md:hidden bg-grey w-12 h-12 rounded-full flex items-center justify-center"
+          >
             <IoSearchOutline className="text-xl" />
           </button>
 
