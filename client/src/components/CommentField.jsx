@@ -51,7 +51,7 @@ const CommentField = ({
     userAuth: { access_token, username, fullname, profile_img },
   } = useContext(UserContext);
 
-  const {
+  let {
     blog,
     blog: {
       _id,
@@ -132,6 +132,7 @@ const CommentField = ({
       console.log(error);
     }
   };
+
   return (
     <>
       <Toaster />

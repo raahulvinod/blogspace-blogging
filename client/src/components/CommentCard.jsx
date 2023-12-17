@@ -24,7 +24,7 @@ const CommentCard = ({ index, leftValue, commentData }) => {
     userAuth: { access_token, username },
   } = useContext(UserContext);
 
-  const {
+  let {
     blog,
     blog: {
       comments,
