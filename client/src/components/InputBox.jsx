@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Field, ErrorMessage } from 'formik';
 
-const InputBox = ({ name, type, id, value, placeholder, icon }) => {
+const InputBox = ({ name, type, id, placeholder, icon }) => {
   const [passwordVisible, setPasswordVisible] = useState(false);
 
   return (
@@ -13,7 +13,6 @@ const InputBox = ({ name, type, id, value, placeholder, icon }) => {
             type === 'password' ? (passwordVisible ? 'text' : 'password') : type
           }
           placeholder={placeholder}
-          value={value}
           id={id}
           className="input-box"
         />
