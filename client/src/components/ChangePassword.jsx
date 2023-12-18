@@ -2,7 +2,10 @@ import { Field, Form, Formik } from 'formik';
 import * as Yup from 'yup';
 import AnimationWrapper from '../utils/animation';
 import InputBox from './InputBox';
-import { Toaster } from 'react-hot-toast';
+import toast, { Toaster } from 'react-hot-toast';
+import { useContext, useState } from 'react';
+import { UserContext } from '../App';
+import axios from 'axios';
 
 const validationSchema = Yup.object({
   currentPassword: Yup.string()
@@ -29,16 +32,43 @@ const validationSchema = Yup.object({
     .required('Password is required'),
 });
 
-const initialValues = {
-  currentPassword: '',
-  newPassword: '',
-};
-
-const handleSubmit = (values) => {
-  console.log(values);
-};
-
 const ChangePassword = () => {
+  const { userAuth: { access_token } = {} } = useContext(UserContext);
+
+  const [isLoading, setIsLoading] = useState(false);
+
+  const initialValues = {
+    currentPassword: '',
+    newPassword: '',
+  };
+
+  const handleSubmit = async (values, { resetForm }) => {
+    let loadingToast;
+    try {
+      setIsLoading(true);
+      loadingToast = toast.loading('Updating...');
+
+      await axios.post(
+        import.meta.env.VITE_SERVER_DOMAIN + '/change-password',
+        values,
+        {
+          headers: {
+            Authorization: `Bearer ${access_token}`,
+          },
+        }
+      );
+
+      toast.dismiss(loadingToast);
+      setIsLoading(false);
+      toast.success('Password updated');
+      resetForm();
+    } catch (error) {
+      setIsLoading(false);
+      toast.dismiss(loadingToast);
+      toast.error(error.response.data.error);
+    }
+  };
+
   return (
     <AnimationWrapper>
       <Toaster />
@@ -72,7 +102,7 @@ const ChangePassword = () => {
               />
             )}
           </Field>
-          <button className="btn-dark px-10" type="submit">
+          <button disabled={isLoading} className="btn-dark px-10" type="submit">
             Change Password
           </button>
         </Form>

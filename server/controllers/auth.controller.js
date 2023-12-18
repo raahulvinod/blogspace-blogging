@@ -132,6 +132,12 @@ export const changePassword = asyncHandler(async (req, res) => {
       return res.status(403).json({ error: 'Incorrect current password' });
     }
 
+    if (currentPassword === newPassword) {
+      return res.status(400).json({
+        error: 'Current password and new password cannot be the same',
+      });
+    }
+
     if (newPassword) {
       const hashedPassword = await bcrypt.hash(newPassword, 10);
       const upadatedPassword = await User.findOneAndUpdate(
