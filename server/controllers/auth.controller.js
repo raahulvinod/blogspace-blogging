@@ -108,3 +108,40 @@ export const googleAuth = asyncHandler(async (req, res) => {
     return res.status(500).json({ error: 'Internal server error' });
   }
 });
+
+export const changePassword = asyncHandler(async (req, res) => {
+  try {
+    const userId = req.user;
+    const { currentPassword, newPassword } = req.body;
+
+    const user = await User.findOne({ _id: userId });
+
+    if (user.google_auth) {
+      return res.status(403).json({
+        error:
+          "You can't change account password because you logged in through google.",
+      });
+    }
+
+    const comparePassword = await bcrypt.compare(
+      currentPassword,
+      user.personal_info.password
+    );
+
+    if (!comparePassword) {
+      return res.status(403).json({ error: 'Incorrect current password' });
+    }
+
+    if (newPassword) {
+      const hashedPassword = await bcrypt.hash(newPassword, 10);
+      const upadatedPassword = await User.findOneAndUpdate(
+        { _id: userId },
+        { $set: { 'personal_info.password': hashedPassword } },
+        { new: true }
+      );
+      res.status(200).json({ status: 'Password changed' });
+    }
+  } catch (error) {
+    throw error;
+  }
+});
