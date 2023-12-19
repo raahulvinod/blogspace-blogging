@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Field, ErrorMessage } from 'formik';
 
-const InputBox = ({ name, type, id, placeholder, icon }) => {
+const InputBox = ({ name, type, id, placeholder, icon, disable = false }) => {
   const [passwordVisible, setPasswordVisible] = useState(false);
 
   return (
@@ -15,6 +15,7 @@ const InputBox = ({ name, type, id, placeholder, icon }) => {
           placeholder={placeholder}
           id={id}
           className="input-box"
+          disabled={disable}
         />
         <i className={'fi ' + icon + ' input-icon'}></i>
 
