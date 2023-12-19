@@ -138,7 +138,26 @@ const EditProfile = () => {
                 Add your social handle below
               </p>
 
-              <div className="md:grid md:grid-cols-2 gap-6 "></div>
+              <div className="md:grid md:grid-cols-2 gap-6 ">
+                {Object.keys(social_links).map((key, i) => {
+                  let link = social_links[key];
+                  return (
+                    <CustomInput
+                      key={i}
+                      name={key}
+                      type="text"
+                      value={link}
+                      placeholder="https://"
+                      icon={`fi ${
+                        key !== 'website' ? 'fi-brands-' + key : 'fi-rr-globe'
+                      }`}
+                    />
+                  );
+                })}
+              </div>
+              <button className="btn-dark w-auto px-10" type="submit">
+                Update
+              </button>
             </div>
           </div>
         </form>
