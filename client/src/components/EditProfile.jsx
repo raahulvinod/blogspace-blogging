@@ -1,6 +1,6 @@
-import { useContext, useEffect, useState } from 'react';
+import { useContext, useEffect, useRef, useState } from 'react';
 import axios from 'axios';
-import { Toaster } from 'react-hot-toast';
+import toast, { Toaster } from 'react-hot-toast';
 
 import { UserContext } from '../App';
 import { profileDataStructure } from '../pages/UserProfile';
@@ -8,15 +8,23 @@ import AnimationWrapper from '../utils/animation';
 import { Loader } from './Loader';
 import InputBox from './InputBox';
 import CustomInput from './CustomInput';
+import { uploadImage } from '../utils/aws';
+import { storeInSession } from '../utils/sessions';
 
 const EditProfile = () => {
-  const { userAuth, userAuth: { access_token } = {} } = useContext(UserContext);
+  const {
+    userAuth,
+    userAuth: { access_token } = {},
+    setUserAuth,
+  } = useContext(UserContext);
 
-  let bioLimit = 150;
+  const bioLimit = 150;
+  const profileImageRef = useRef();
 
   const [profile, setProfile] = useState(profileDataStructure);
   const [loading, setLoading] = useState(true);
   const [charactersLeft, setCharactersLeft] = useState(bioLimit);
+  const [updatedProfileImg, setUpdatedProfileImg] = useState(null);
 
   const {
     personal_info: {
@@ -56,6 +64,55 @@ const EditProfile = () => {
     setCharactersLeft(bioLimit - e.target.value.length);
   };
 
+  const handleImagePreview = (e) => {
+    const img = e.target.files[0];
+    profileImageRef.current.src = URL.createObjectURL(img);
+
+    setUpdatedProfileImg(img);
+  };
+
+  const handleImageUpload = async (e) => {
+    e.preventDefault();
+
+    try {
+      if (updatedProfileImg) {
+        let loadingToast = toast.loading('Uploading...');
+        e.target.setAttribute('disabled', true);
+
+        const url = await uploadImage(updatedProfileImg);
+
+        if (url) {
+          const { data } = await axios.post(
+            import.meta.env.VITE_SERVER_DOMAIN + '/update-profile-image',
+            { url },
+            {
+              headers: {
+                Authorization: `Bearer ${access_token}`,
+              },
+            }
+          );
+
+          if (data) {
+            let newUserAuth = { ...userAuth, profile_img: data.profile_img };
+
+            storeInSession('user', JSON.stringify(newUserAuth));
+
+            setUserAuth(newUserAuth);
+
+            setUpdatedProfileImg(null);
+            toast.dismiss(loadingToast);
+            e.target.removeAttribute('disabled');
+            toast.success('Uploaded');
+          }
+        }
+      }
+    } catch (error) {
+      console.log(error);
+      toast.dismiss(loadingToast);
+      e.target.removeAttribute('disabled');
+      toast.error('Profile picture upload failed, try again later');
+    }
+  };
   return (
     <AnimationWrapper>
       {loading ? (
@@ -75,15 +132,19 @@ const EditProfile = () => {
                 <div className="w-full h-full absolute top-0 left-0 flex items-center justify-center text-white bg-black/30 opacity-0 hover:opacity-100 cursor-pointer">
                   Upload image
                 </div>
-                <img src={profile_img} />
+                <img ref={profileImageRef} src={profile_img} />
               </label>
               <input
                 type="file"
                 id="uploadImg"
+                onChange={handleImagePreview}
                 accept=".jpeg, .png, .jpg"
                 hidden
               />
-              <button className="btn-light mt-5 max-lg:center lg:w-full px-10">
+              <button
+                className="btn-light mt-5 max-lg:center lg:w-full px-10"
+                onClick={handleImageUpload}
+              >
                 upload
               </button>
             </div>

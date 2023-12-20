@@ -52,3 +52,23 @@ export const isLikedByUser = asyncHandler(async (req, res) => {
     throw error;
   }
 });
+
+// Update profile image
+export const updateProfileImage = asyncHandler(async (req, res) => {
+  try {
+    const userId = req.user;
+    const { url } = req.body;
+
+    const user = await User.findOneAndUpdate(
+      { _id: userId },
+      { 'personal_info.profile_img': url },
+      { new: true }
+    );
+
+    if (user) {
+      return res.status(200).json({ profile_img: url });
+    }
+  } catch (error) {
+    throw error;
+  }
+});
