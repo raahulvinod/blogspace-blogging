@@ -72,3 +72,74 @@ export const updateProfileImage = asyncHandler(async (req, res) => {
     throw error;
   }
 });
+
+// Update profile
+export const updateProfile = asyncHandler(async (req, res) => {
+  try {
+    const userId = req.user;
+    const { username, bio, social_links } = req.body;
+
+    const bioLimit = 150;
+
+    if (username.length < 3) {
+      return res
+        .status(403)
+        .json({ error: 'Username should be at least 3 letters' });
+    }
+
+    if (bio.length > bioLimit) {
+      return res
+        .status(403)
+        .json({ error: `Bio should not be more than ${bioLimit} characters` });
+    }
+
+    let socialLinksArr = Object.keys(social_links);
+
+    // Social links validations
+    // try {
+    for (let i = 0; i < socialLinksArr.length; i++) {
+      if (social_links[socialLinksArr[i]].length) {
+        console.log('hello');
+        let hostname = new URL(social_links[socialLinksArr[i]]).hostname;
+        console.log('hostname', hostname);
+
+        if (
+          !hostname.includes(`${socialLinksArr[i]}.com`) &&
+          social_links[i] !== 'website'
+        ) {
+          return res.status(403).json({
+            error: `${socialLinksArr[i]} link is invalid. You must enter a full link`,
+          });
+        }
+      }
+    }
+    // } catch (error) {
+    //   return res.status(500).status({
+    //     error: 'You must provide full social links with http(s) included',
+    //   });
+    // }
+
+    // Update profile data
+    let userData = {
+      'personal_info.username': username,
+      'personal_info.bio': bio,
+      social_links,
+    };
+
+    const user = await User.findOneAndUpdate(
+      { _id: userId },
+      { $set: userData },
+      { runValidators: true, new: true }
+    );
+
+    if (user) {
+      return res.status(200).json({ username });
+    }
+  } catch (error) {
+    if (error.code === 11000) {
+      return res.status(409).json({ error: 'username is already taken' });
+    }
+
+    return res.status(500).json({ error: error.message });
+  }
+});

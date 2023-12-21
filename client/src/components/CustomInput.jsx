@@ -22,7 +22,7 @@ const CustomInput = ({
         id={id}
         className="input-box"
         disabled={disable}
-        value={value}
+        defaultValue={value}
       />
       <i className={'fi ' + icon + ' input-icon'}></i>
 

@@ -20,6 +20,7 @@ const EditProfile = () => {
 
   const bioLimit = 150;
   const profileImageRef = useRef();
+  const editProfileForm = useRef();
 
   const [profile, setProfile] = useState(profileDataStructure);
   const [loading, setLoading] = useState(true);
@@ -113,12 +114,98 @@ const EditProfile = () => {
       toast.error('Profile picture upload failed, try again later');
     }
   };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    let loadingToast;
+
+    try {
+      const form = new FormData(editProfileForm.current);
+
+      const formData = {};
+
+      for (let [key, value] of form.entries()) {
+        formData[key] = value;
+      }
+
+      const {
+        username,
+        bio,
+        youtube,
+        facebook,
+        twitter,
+        instagram,
+        github,
+        website,
+      } = formData;
+
+      if (username.length < 3) {
+        return toast.error('Username should be at least 3 letters long');
+      }
+
+      if (bio.length > bioLimit) {
+        return toast.error(`Bio should not be more than ${bioLimit}`);
+      }
+
+      loadingToast = toast.loading('Updating...');
+      e.target.setAttribute('disabled', true);
+
+      const { data } = await axios.post(
+        import.meta.env.VITE_SERVER_DOMAIN + '/update-profile',
+        {
+          username,
+          bio,
+          social_links: {
+            youtube,
+            facebook,
+            twitter,
+            github,
+            instagram,
+            website,
+          },
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${access_token}`,
+          },
+        }
+      );
+
+      if (data) {
+        if (userAuth.username !== data.username) {
+          const newUserAuth = { ...userAuth, username: data.username };
+
+          storeInSession('user', JSON.stringify(newUserAuth));
+          setUserAuth(newUserAuth);
+        }
+      }
+
+      toast.dismiss(loadingToast);
+      e.target.removeAttribute('disabled');
+      toast.success('Profile updated');
+    } catch (error) {
+      console.error('An error occurred:', error);
+
+      // Handle specific error cases and show appropriate toasts
+      if (error.response && error.response.data) {
+        toast.error(error.response.data.error);
+      } else {
+        toast.error('An error occurred while updating the profile.');
+      }
+
+      // re-enable the button and dismiss the loading toast here
+      toast.dismiss(loadingToast);
+      e.target.removeAttribute('disabled');
+    }
+  };
+
   return (
     <AnimationWrapper>
       {loading ? (
         <Loader />
       ) : (
-        <form>
+        <form ref={editProfileForm}>
           <Toaster />
           <h1 className="max-md:hidden">Edit Profile</h1>
 
@@ -165,7 +252,7 @@ const EditProfile = () => {
                   <CustomInput
                     type="email"
                     name="email"
-                    value={fullname}
+                    value={email}
                     placeholder="Email address"
                     disable={true}
                     icon="fi-rr-envelope"
@@ -175,7 +262,7 @@ const EditProfile = () => {
 
               <CustomInput
                 type="text"
-                name="usename"
+                name="username"
                 value={profile_username}
                 placeholder="Username"
                 icon="fi-rr-at"
@@ -216,7 +303,11 @@ const EditProfile = () => {
                   );
                 })}
               </div>
-              <button className="btn-dark w-auto px-10" type="submit">
+              <button
+                onClick={handleSubmit}
+                className="btn-dark w-auto px-10"
+                type="submit"
+              >
                 Update
               </button>
             </div>
