@@ -96,28 +96,28 @@ export const updateProfile = asyncHandler(async (req, res) => {
     let socialLinksArr = Object.keys(social_links);
 
     // Social links validations
-    // try {
-    for (let i = 0; i < socialLinksArr.length; i++) {
-      if (social_links[socialLinksArr[i]].length) {
-        console.log('hello');
-        let hostname = new URL(social_links[socialLinksArr[i]]).hostname;
-        console.log('hostname', hostname);
+    try {
+      for (let i = 0; i < socialLinksArr.length; i++) {
+        if (social_links[socialLinksArr[i]].length) {
+          console.log('hello');
+          let hostname = new URL(social_links[socialLinksArr[i]]).hostname;
+          console.log('hostname', hostname);
 
-        if (
-          !hostname.includes(`${socialLinksArr[i]}.com`) &&
-          social_links[i] !== 'website'
-        ) {
-          return res.status(403).json({
-            error: `${socialLinksArr[i]} link is invalid. You must enter a full link`,
-          });
+          if (
+            !hostname.includes(`${socialLinksArr[i]}.com`) &&
+            social_links[i] !== 'website'
+          ) {
+            return res.status(403).json({
+              error: `${socialLinksArr[i]} link is invalid. You must enter a full link`,
+            });
+          }
         }
       }
+    } catch (error) {
+      return res.status(500).status({
+        error: 'You must provide full social links with http(s) included',
+      });
     }
-    // } catch (error) {
-    //   return res.status(500).status({
-    //     error: 'You must provide full social links with http(s) included',
-    //   });
-    // }
 
     // Update profile data
     let userData = {
