@@ -99,9 +99,7 @@ export const updateProfile = asyncHandler(async (req, res) => {
     try {
       for (let i = 0; i < socialLinksArr.length; i++) {
         if (social_links[socialLinksArr[i]].length) {
-          console.log('hello');
           let hostname = new URL(social_links[socialLinksArr[i]]).hostname;
-          console.log('hostname', hostname);
 
           if (
             !hostname.includes(`${socialLinksArr[i]}.com`) &&
