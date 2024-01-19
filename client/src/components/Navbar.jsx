@@ -1,4 +1,4 @@
-import { useContext, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { Link, Outlet, useNavigate } from 'react-router-dom';
 import { IoSearchOutline } from 'react-icons/io5';
 
@@ -6,15 +6,41 @@ import logo from '../images/blog.png';
 import { UserContext } from '../App';
 import UserNavigation from './UserNavigation';
 import { removeFromSession } from '../utils/sessions';
+import axios from 'axios';
 
 const Navbar = () => {
   const [searchBoxVisibility, setSearchBoxVisibility] = useState(false);
   const [userNavPanel, setUserNavPanel] = useState(false);
 
   const { userAuth = {}, setUserAuth } = useContext(UserContext);
-  const { access_token, profile_img, username } = userAuth;
+  const { access_token, profile_img, username, new_notification_available } =
+    userAuth;
 
   const navigate = useNavigate();
+
+  const fetchNotifications = async () => {
+    try {
+      if (access_token) {
+        const { data } = await axios.get(
+          import.meta.env.VITE_SERVER_DOMAIN + '/new-notification',
+          {
+            headers: {
+              Authorization: `Bearer ${access_token}`,
+            },
+          }
+        );
+        setUserAuth({ ...userAuth, ...data });
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  useEffect(() => {
+    if (access_token) {
+      fetchNotifications();
+    }
+  }, [access_token]);
 
   const signOutUser = () => {
     removeFromSession('user');
@@ -28,6 +54,8 @@ const Navbar = () => {
       navigate(`/search/${query}`);
     }
   };
+
+  console.log(new_notification_available);
 
   return (
     <>
@@ -68,6 +96,9 @@ const Navbar = () => {
               <Link to="/dashboard/notification">
                 <button className="w-12 h-12 rounded-full bg-grey relative hover:bg-black/10">
                   <i className="fi fi-rr-bell text-2xl block mt-1"></i>
+                  {new_notification_available && (
+                    <span className="w-3 h-3 bg-red rounded-full absolute z-10 top-2 right-2"></span>
+                  )}
                 </button>
               </Link>
 

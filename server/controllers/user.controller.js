@@ -141,3 +141,24 @@ export const updateProfile = asyncHandler(async (req, res) => {
     return res.status(500).json({ error: error.message });
   }
 });
+
+export const newNotification = asyncHandler(async (req, res) => {
+  try {
+    const userId = req.user;
+
+    const result = await Notification.exists({
+      notification_for: userId,
+      seen: false,
+      user: { $ne: userId },
+    });
+
+    if (result) {
+      return res.status(200).json({ new_notification_available: true });
+    } else {
+      return res.status(200).json({ new_notification_available: false });
+    }
+  } catch (error) {
+    console.log(error.message);
+    throw error;
+  }
+});
