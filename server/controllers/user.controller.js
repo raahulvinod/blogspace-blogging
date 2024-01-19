@@ -162,3 +162,65 @@ export const newNotification = asyncHandler(async (req, res) => {
     throw error;
   }
 });
+
+export const notifications = asyncHandler(async (req, res) => {
+  try {
+    const userId = req.user;
+
+    const { page, filter, deletedDocCount } = req.body;
+
+    const maxLimit = 10;
+
+    const findQuery = { notification_for: userId, user: { $ne: userId } };
+
+    const skipDocs = (page - 1) * maxLimit;
+
+    if (filter !== 'all') {
+      findQuery.type = filter;
+    }
+
+    if (deletedDocCount) {
+      skipDocs -= deletedDocCount;
+    }
+
+    const notifiations = await Notification.find(findQuery)
+      .skip(skipDocs)
+      .limit(maxLimit)
+      .populate('blog', 'title blog_id')
+      .populate(
+        'user',
+        'personal_info.fullname personal_info.username personal_info.profile_img'
+      )
+      .populate('comment', 'comment')
+      .populate('replied_on_comment', 'comment')
+      .populate('reply', 'comment')
+      .sort({ createdAt: -1 })
+      .select('createdAt type seen reply');
+
+    return res.status(200).json({ notifiations });
+  } catch (error) {
+    console.log(error.message);
+    throw error;
+  }
+});
+
+export const allNotificationsCount = asyncHandler(async (req, res) => {
+  try {
+    const userId = req.user;
+
+    const { filter } = req.body;
+
+    const findQuery = { notification_for: userId, user: { $ne: userId } };
+
+    if (filter !== 'all') {
+      findQuery.type = filter;
+    }
+
+    const notifiationCount = await Notification.countDocuments(findQuery);
+
+    return res.status(200).json({ totalDocs: notifiationCount });
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+});

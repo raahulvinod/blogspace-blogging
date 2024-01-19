@@ -1,8 +1,10 @@
 import express from 'express';
 import {
+  allNotificationsCount,
   getUserProfile,
   isLikedByUser,
   newNotification,
+  notifications,
   searchUsers,
   updateProfile,
   updateProfileImage,
@@ -17,5 +19,7 @@ router.post('/isliked-by-user', verifyToken, isLikedByUser);
 router.post('/update-profile-image', verifyToken, updateProfileImage);
 router.post('/update-profile', verifyToken, updateProfile);
 router.get('/new-notification', verifyToken, newNotification);
+router.post('/notifications', verifyToken, notifications);
+router.post('/all-notification-count', verifyToken, allNotificationsCount);
 
 export default router;
