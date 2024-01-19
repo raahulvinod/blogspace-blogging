@@ -97,7 +97,7 @@ const SideNav = () => {
               Blogs
             </NavLink>
             <NavLink
-              to="/dashboard/notication"
+              to="/dashboard/notifications"
               onClick={(e) => setPageState(e.target.innerText)}
               className="sidebar-link"
             >
