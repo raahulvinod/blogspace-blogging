@@ -183,7 +183,7 @@ export const notifications = asyncHandler(async (req, res) => {
       skipDocs -= deletedDocCount;
     }
 
-    const notifiations = await Notification.find(findQuery)
+    const notifications = await Notification.find(findQuery)
       .skip(skipDocs)
       .limit(maxLimit)
       .populate('blog', 'title blog_id')
@@ -197,7 +197,7 @@ export const notifications = asyncHandler(async (req, res) => {
       .sort({ createdAt: -1 })
       .select('createdAt type seen reply');
 
-    return res.status(200).json({ notifiations });
+    return res.status(200).json({ notifications });
   } catch (error) {
     console.log(error.message);
     throw error;
