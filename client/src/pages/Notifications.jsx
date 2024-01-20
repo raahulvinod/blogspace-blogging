@@ -7,6 +7,7 @@ import AnimationWrapper from '../utils/animation';
 import NoData from '../components/NoData';
 import NotificationCard from '../components/NotificationCard';
 import LoadMoreButton from '../components/LoadMoreButton';
+import { calcLength } from 'framer-motion';
 
 const Notifications = () => {
   const [filter, setFilter] = useState('all');
@@ -86,7 +87,11 @@ const Notifications = () => {
             notifications.results.map((notification, i) => {
               return (
                 <AnimationWrapper key={i} transition={{ delay: i * 0.08 }}>
-                  <NotificationCard />
+                  <NotificationCard
+                    data={notification}
+                    index={i}
+                    notificationState={{ notifications, setNotifications }}
+                  />
                 </AnimationWrapper>
               );
             })
