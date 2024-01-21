@@ -4,6 +4,7 @@ import { useContext, useState } from 'react';
 
 import { NotificationCommentField } from './NotificationCommentField';
 import { UserContext } from '../App';
+import axios from 'axios';
 
 const NotificationCard = ({ data, index, notificationState }) => {
   const [isReplying, setIsReplying] = useState(false);
@@ -30,8 +31,48 @@ const NotificationCard = ({ data, index, notificationState }) => {
     },
   } = useContext(UserContext);
 
+  const {
+    notifications,
+    notifications: { results, totalDocs },
+    setNotifications,
+  } = notificationState;
+
   const handleReplyClick = () => {
     setIsReplying((prevValue) => !prevValue);
+  };
+
+  const handleDelete = async (comment_id, type, target) => {
+    target.setAttribute('disabled', true);
+
+    try {
+      await axios.post(
+        import.meta.env.VITE_SERVER_DOMAIN + '/delete-comment',
+        {
+          _id: comment_id,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${access_token}`,
+          },
+        }
+      );
+
+      if (type === 'comment') {
+        results.splice(index, 1);
+      } else {
+        delete results[index].reply;
+      }
+
+      target.removeAttribute('disabled');
+      setNotifications({
+        ...notifications,
+        results,
+        totalDocs: totalDocs - 1,
+        deleteDocCount: notifications.deleteDocCount + 1,
+      });
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   return (
@@ -94,7 +135,12 @@ const NotificationCard = ({ data, index, notificationState }) => {
                 Reply
               </button>
             )}
-            <button className="underline hover:text-black">Delete</button>
+            <button
+              onClick={(e) => handleDelete(comment._id, 'comment', e.target)}
+              className="underline hover:text-black"
+            >
+              Delete
+            </button>
           </>
         )}
       </div>
@@ -141,6 +187,12 @@ const NotificationCard = ({ data, index, notificationState }) => {
             </div>
           </div>
           <p className="ml-14 font-gelasio text-xl my-2">{reply.comment}</p>
+          <button
+            onClick={(e) => handleDelete(reply._id, 'reply', e.target)}
+            className="underline hover:text-black ml-14 mt-2"
+          >
+            Delete
+          </button>
         </div>
       )}
     </div>
