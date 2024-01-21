@@ -55,8 +55,6 @@ const Navbar = () => {
     }
   };
 
-  console.log(new_notification_available);
-
   return (
     <>
       <nav className="navbar z-50">

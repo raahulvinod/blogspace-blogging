@@ -298,7 +298,13 @@ export const addComment = asyncHandler(async (req, res) => {
   try {
     const userId = req.user;
 
-    const { _id, comment: comments, blog_author, replying_to } = req.body;
+    const {
+      _id,
+      comment: comments,
+      blog_author,
+      replying_to,
+      notification_id,
+    } = req.body;
 
     if (!comments.length) {
       return res
@@ -351,6 +357,14 @@ export const addComment = asyncHandler(async (req, res) => {
       );
 
       notificationData.notification_for = replyingToComment.commented_by;
+
+      if (notification_id) {
+        const notification = await Notification.findOneAndUpdate(
+          { _id: notification_id },
+          { reply: commentFile._id },
+          { new: true }
+        );
+      }
     }
 
     new Notification(notificationData).save();

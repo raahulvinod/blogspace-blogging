@@ -31,8 +31,6 @@ const Notifications = () => {
         }
       );
 
-      console.log('notification data', data);
-
       const formatedData = await filterPagination({
         state: notifications,
         data,
@@ -43,7 +41,6 @@ const Notifications = () => {
       });
 
       setNotifications(formatedData);
-      console.log(formatedData);
     } catch (error) {
       console.log(error);
     }
