@@ -197,6 +197,10 @@ export const notifications = asyncHandler(async (req, res) => {
       .sort({ createdAt: -1 })
       .select('createdAt type seen reply');
 
+    await Notification.updateMany(findQuery, { seen: true })
+      .skip(skipDocs)
+      .limit(maxLimit);
+
     return res.status(200).json({ notifications });
   } catch (error) {
     console.log(error.message);

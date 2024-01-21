@@ -7,13 +7,16 @@ import AnimationWrapper from '../utils/animation';
 import NoData from '../components/NoData';
 import NotificationCard from '../components/NotificationCard';
 import LoadMoreButton from '../components/LoadMoreButton';
-import { calcLength } from 'framer-motion';
 
 const Notifications = () => {
   const [filter, setFilter] = useState('all');
   const [notifications, setNotifications] = useState(null);
 
-  const { userAuth: { access_token } = {} } = useContext(UserContext);
+  const {
+    userAuth,
+    userAuth: { access_token, new_notification_available } = {},
+    setUserAuth,
+  } = useContext(UserContext);
 
   let filters = ['all', 'like', 'comment', 'reply'];
 
@@ -30,6 +33,9 @@ const Notifications = () => {
           },
         }
       );
+
+      if (new_notification_available)
+        setUserAuth({ ...userAuth, new_notification_available: false });
 
       const formatedData = await filterPagination({
         state: notifications,

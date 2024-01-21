@@ -10,6 +10,7 @@ const NotificationCard = ({ data, index, notificationState }) => {
   const [isReplying, setIsReplying] = useState(false);
 
   const {
+    seen,
     type,
     reply,
     createdAt,
@@ -76,7 +77,11 @@ const NotificationCard = ({ data, index, notificationState }) => {
   };
 
   return (
-    <div className="p-6 border-b border-grey border-l-black">
+    <div
+      className={`p-6 border-b border-grey border-l-black  ${
+        !seen && 'border-l-2'
+      }`}
+    >
       <div className="flex gap-5 mb-3">
         <img
           src={profile_img}
