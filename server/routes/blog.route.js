@@ -14,6 +14,7 @@ import {
   totalBlogCount,
   trendingBlogs,
   userWrittenBlogs,
+  userWrittenBlogsCount,
 } from '../controllers/blog.controller.js';
 import verifyToken from '../middlewares/verifyToken.js';
 
@@ -33,5 +34,6 @@ router.post('/get-blog-comments', getBlogComments);
 router.post('/get-replies', getReplies);
 router.post('/delete-comment', verifyToken, deleteComment);
 router.post('/user-written-blogs', verifyToken, userWrittenBlogs);
+router.post('/user-written-blogs-count', verifyToken, userWrittenBlogsCount);
 
 export default router;

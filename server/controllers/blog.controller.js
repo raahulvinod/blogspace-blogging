@@ -526,3 +526,21 @@ export const userWrittenBlogs = asyncHandler(async (req, res) => {
     throw error;
   }
 });
+
+export const userWrittenBlogsCount = asyncHandler(async (req, res) => {
+  try {
+    const userId = req.user;
+
+    const { draft, query } = req.body;
+
+    const blogsCount = await Blog.countDocuments({
+      author: userId,
+      draft,
+      title: new RegExp(query, 'i'),
+    });
+
+    return res.status(200).json({ totalDocs: blogsCount });
+  } catch (error) {
+    throw error;
+  }
+});
