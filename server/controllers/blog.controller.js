@@ -497,3 +497,32 @@ export const deleteComment = asyncHandler(async (req, res) => {
     throw error;
   }
 });
+
+export const userWrittenBlogs = asyncHandler(async (req, res) => {
+  try {
+    const userId = req.user;
+
+    const { page, draft, query, deleteDocCount } = req.body;
+
+    const maxLimit = 5;
+    const skipDocs = (page - 1) * maxLimit;
+
+    if (deleteDocCount) skipDocs -= deleteDocCount;
+
+    const blogs = await Blog.find({
+      author: userId,
+      draft,
+      title: new RegExp(query, 'i'),
+    })
+      .skip(skipDocs)
+      .limit(maxLimit)
+      .sort({ publishedAt: -1 })
+      .select(
+        'title banner publishedAt blog_id activity description draft -_id'
+      );
+
+    return res.status(200).json({ blogs });
+  } catch (error) {
+    throw error;
+  }
+});

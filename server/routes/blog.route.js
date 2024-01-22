@@ -13,6 +13,7 @@ import {
   searchBlogs,
   totalBlogCount,
   trendingBlogs,
+  userWrittenBlogs,
 } from '../controllers/blog.controller.js';
 import verifyToken from '../middlewares/verifyToken.js';
 
@@ -31,5 +32,6 @@ router.post('/add-comment', verifyToken, addComment);
 router.post('/get-blog-comments', getBlogComments);
 router.post('/get-replies', getReplies);
 router.post('/delete-comment', verifyToken, deleteComment);
+router.post('/user-written-blogs', verifyToken, userWrittenBlogs);
 
 export default router;
