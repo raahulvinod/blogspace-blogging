@@ -4,6 +4,11 @@ import { useContext, useEffect, useState } from 'react';
 import { UserContext } from '../App';
 import { filterPagination } from '../utils/filterPagination';
 import { Toaster } from 'react-hot-toast';
+import InpageNavigation from '../components/InpageNavigation';
+import { Loader } from '../components/Loader';
+import NoData from '../components/NoData';
+import AnimationWrapper from '../utils/animation';
+import ManagePubllishedBlogCard from '../components/ManagePubllishedBlogCard';
 
 const ManageBlogs = () => {
   const [blogs, setBlogs] = useState(null);
@@ -84,6 +89,26 @@ const ManageBlogs = () => {
         />
         <i className="fi fi-rr-search absolute right-[10%] md:pointer-events-none md:left-5 top-1/2 -translate-y-1/2 text-xl text-dark-grey"></i>
       </div>
+
+      <InpageNavigation routes={['Published Blogs', 'Drafts']}>
+        {
+          // Published blog
+          blogs === null ? (
+            <Loader />
+          ) : blogs.results.length ? (
+            blogs.results.map((blog, i) => {
+              return (
+                <AnimationWrapper key={i} transition={{ delay: i * 0.04 }}>
+                  <ManagePubllishedBlogCard blog={blog} />
+                </AnimationWrapper>
+              );
+            })
+          ) : (
+            <NoData message="No published blogs" />
+          )
+        }
+        <h1>This is Drafts blogs</h1>
+      </InpageNavigation>
     </>
   );
 };
