@@ -1,7 +1,9 @@
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import { Link } from 'react-router-dom';
 
 import { getDay } from '../utils/date';
+import { UserContext } from '../App';
+import axios from 'axios';
 
 const BlogStats = ({ stats }) => {
   return (
@@ -34,6 +36,10 @@ export const ManagePubllishedBlogCard = ({ blog }) => {
 
   const [showStat, setShowStat] = useState(false);
 
+  const {
+    userAuth: { access_token },
+  } = useContext(UserContext);
+
   return (
     <>
       <div className="flex gap-10 border-b mb-6 max-md:px-4 border-grey pb-6 items-center">
@@ -62,7 +68,12 @@ export const ManagePubllishedBlogCard = ({ blog }) => {
             >
               Stats
             </button>
-            <button className="pr-4 py-2 underline text-red">Delete</button>
+            <button
+              onClick={(e) => deleteBlog(blog, access_token, e.target)}
+              className="pr-4 py-2 underline text-red"
+            >
+              Delete
+            </button>
           </div>
         </div>
 
@@ -80,9 +91,14 @@ export const ManagePubllishedBlogCard = ({ blog }) => {
   );
 };
 
-export const ManageDraftBlogPost = ({ blog, index }) => {
-  console.log(blog);
-  const { title, des, blog_id } = blog;
+export const ManageDraftBlogPost = ({ blog }) => {
+  const { title, des, blog_id, index: initialIndex } = blog;
+
+  const {
+    userAuth: { access_token },
+  } = useContext(UserContext);
+
+  const index = initialIndex + 1;
 
   return (
     <div className="flex gap-5 lg:gap-10 pb-6 border-b mb-6 border-grey">
@@ -99,9 +115,56 @@ export const ManageDraftBlogPost = ({ blog, index }) => {
           <Link to={`/editor/${blog_id}`} className="pr-4 py-2 underline">
             Edit
           </Link>
-          <button className="pr-4 py-2 underline text-red">Delete</button>
+          <button
+            onClick={(e) => deleteBlog(blog, access_token, e.target)}
+            className="pr-4 py-2 underline text-red"
+          >
+            Delete
+          </button>
         </div>
       </div>
     </div>
   );
+};
+
+const deleteBlog = async (blog, access_token, target) => {
+  const { index, blog_id, setStateFunc } = blog;
+
+  try {
+    target.setAttribute('disabled', true);
+
+    await axios.post(
+      import.meta.env.VITE_SERVER_DOMAIN + '/delete-blog',
+      {
+        blog_id,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${access_token}`,
+        },
+      }
+    );
+
+    target.removeAttribute('disabled');
+
+    setStateFunc((prevVal) => {
+      const { deletedDocCount, totalDocs, results } = prevVal;
+
+      results.splice(index, 1);
+
+      const newDeletedDocCount = !deletedDocCount ? 0 : deletedDocCount;
+
+      if (!results.length && totalDocs - 1 > 0) {
+        return null;
+      }
+
+      return {
+        ...prevVal,
+        totalDocs: totalDocs - 1,
+        deletedDocCount: newDeletedDocCount + 1,
+      };
+    });
+  } catch (error) {
+    console.log(error);
+  }
 };
