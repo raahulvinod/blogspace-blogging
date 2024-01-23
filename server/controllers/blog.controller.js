@@ -542,3 +542,27 @@ export const userWrittenBlogsCount = asyncHandler(async (req, res) => {
     throw error;
   }
 });
+
+export const deleteBlog = asyncHandler(async (req, res) => {
+  try {
+    const userId = req.user;
+    const { blog_id } = req.body;
+
+    const blog = await Blog.findOneAndDelete({ blog_id });
+
+    await Notification.deleteMany({ blog: blog._id });
+
+    await Comment.deleteMany({ blog_id: blog._id });
+
+    await User.findOneAndUpdate(
+      { _id: userId },
+      { $pull: { blogs: blog._id }, $inc: { 'account_info.total_posts': -1 } }
+    );
+
+    return res
+      .status(200)
+      .json({ success: true, message: 'Blog deleted successfully' });
+  } catch (error) {
+    throw error;
+  }
+});
