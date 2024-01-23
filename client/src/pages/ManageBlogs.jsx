@@ -13,6 +13,7 @@ import {
   ManagePubllishedBlogCard,
   ManageDraftBlogPost,
 } from '../components/ManagePubllishedBlogCard';
+import LoadMoreButton from '../components/LoadMoreButton';
 
 const ManageBlogs = () => {
   const [blogs, setBlogs] = useState(null);
@@ -98,15 +99,25 @@ const ManageBlogs = () => {
           blogs === null ? (
             <Loader />
           ) : blogs.results.length ? (
-            blogs.results.map((blog, i) => {
-              return (
-                <AnimationWrapper key={i} transition={{ delay: i * 0.04 }}>
-                  <ManagePubllishedBlogCard
-                    blog={{ ...blog, index: i, setStateFunc: setBlogs }}
-                  />
-                </AnimationWrapper>
-              );
-            })
+            <>
+              {blogs.results.map((blog, i) => {
+                return (
+                  <AnimationWrapper key={i} transition={{ delay: i * 0.04 }}>
+                    <ManagePubllishedBlogCard
+                      blog={{ ...blog, index: i, setStateFunc: setBlogs }}
+                    />
+                  </AnimationWrapper>
+                );
+              })}
+              <LoadMoreButton
+                state={blogs}
+                fetchData={getBlogs}
+                additionalParam={{
+                  draft: false,
+                  deletedDocCount: blogs.deletedDocCount,
+                }}
+              />
+            </>
           ) : (
             <NoData message="No published blogs" />
           )
@@ -117,15 +128,25 @@ const ManageBlogs = () => {
           drafts === null ? (
             <Loader />
           ) : drafts.results.length ? (
-            drafts.results.map((blog, i) => {
-              return (
-                <AnimationWrapper key={i} transition={{ delay: i * 0.04 }}>
-                  <ManageDraftBlogPost
-                    blog={{ ...blog, index: i, setStateFunc: setDrafts }}
-                  />
-                </AnimationWrapper>
-              );
-            })
+            <>
+              {drafts.results.map((blog, i) => {
+                return (
+                  <AnimationWrapper key={i} transition={{ delay: i * 0.04 }}>
+                    <ManageDraftBlogPost
+                      blog={{ ...blog, index: i, setStateFunc: setDrafts }}
+                    />
+                  </AnimationWrapper>
+                );
+              })}
+              <LoadMoreButton
+                state={drafts}
+                fetchData={getBlogs}
+                additionalParam={{
+                  draft: true,
+                  deletedDocCount: drafts.deletedDocCount,
+                }}
+              />
+            </>
           ) : (
             <NoData message="No draft blogs" />
           )
