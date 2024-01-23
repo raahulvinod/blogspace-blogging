@@ -14,11 +14,14 @@ import {
   ManageDraftBlogPost,
 } from '../components/ManagePubllishedBlogCard';
 import LoadMoreButton from '../components/LoadMoreButton';
+import { useSearchParams } from 'react-router-dom';
 
 const ManageBlogs = () => {
   const [blogs, setBlogs] = useState(null);
   const [drafts, setDrafts] = useState(null);
   const [query, setQuery] = useState('');
+
+  const activeTab = useSearchParams()[0].get('tab');
 
   const { userAuth: { access_token } = {} } = useContext(UserContext);
 
@@ -93,7 +96,10 @@ const ManageBlogs = () => {
         <i className="fi fi-rr-search absolute right-[10%] md:pointer-events-none md:left-5 top-1/2 -translate-y-1/2 text-xl text-dark-grey"></i>
       </div>
 
-      <InpageNavigation routes={['Published Blogs', 'Drafts']}>
+      <InpageNavigation
+        routes={['Published Blogs', 'Drafts']}
+        defaultActiveIndex={activeTab !== 'draft' ? 0 : 1}
+      >
         {
           // Published blogs
           blogs === null ? (
