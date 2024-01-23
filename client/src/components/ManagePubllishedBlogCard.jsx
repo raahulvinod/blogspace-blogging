@@ -1,6 +1,7 @@
-import { Link } from 'react-router-dom';
-import { getDay } from '../utils/date';
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
+
+import { getDay } from '../utils/date';
 
 const BlogStats = ({ stats }) => {
   return (
@@ -28,9 +29,8 @@ const BlogStats = ({ stats }) => {
   );
 };
 
-const ManagePubllishedBlogCard = ({ blog }) => {
+export const ManagePubllishedBlogCard = ({ blog }) => {
   const { banner, blog_id, title, publishedAt, activity } = blog;
-  console.log(activity);
 
   const [showStat, setShowStat] = useState(false);
 
@@ -80,4 +80,28 @@ const ManagePubllishedBlogCard = ({ blog }) => {
   );
 };
 
-export default ManagePubllishedBlogCard;
+export const ManageDraftBlogPost = ({ blog, index }) => {
+  console.log(blog);
+  const { title, des, blog_id } = blog;
+
+  return (
+    <div className="flex gap-5 lg:gap-10 pb-6 border-b mb-6 border-grey">
+      <h1 className="blog-index text-center pl-4 md:pl-6 flex-none">
+        {index < 10 ? '0' + index : index}
+      </h1>
+
+      <div>
+        <h1 className="blog-title mb-3">{title}</h1>
+        <p className="line-clamp-2 font-gelasio">
+          {des.length ? des : 'No Description'}
+        </p>
+        <div className="flex gap-6 mt-3">
+          <Link to={`/editor/${blog_id}`} className="pr-4 py-2 underline">
+            Edit
+          </Link>
+          <button className="pr-4 py-2 underline text-red">Delete</button>
+        </div>
+      </div>
+    </div>
+  );
+};

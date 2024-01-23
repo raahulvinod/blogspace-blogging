@@ -517,9 +517,7 @@ export const userWrittenBlogs = asyncHandler(async (req, res) => {
       .skip(skipDocs)
       .limit(maxLimit)
       .sort({ publishedAt: -1 })
-      .select(
-        'title banner publishedAt blog_id activity description draft -_id'
-      );
+      .select('title banner publishedAt blog_id activity des draft -_id');
 
     return res.status(200).json({ blogs });
   } catch (error) {

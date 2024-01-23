@@ -4,11 +4,15 @@ import { useContext, useEffect, useState } from 'react';
 import { UserContext } from '../App';
 import { filterPagination } from '../utils/filterPagination';
 import { Toaster } from 'react-hot-toast';
+
 import InpageNavigation from '../components/InpageNavigation';
 import { Loader } from '../components/Loader';
 import NoData from '../components/NoData';
 import AnimationWrapper from '../utils/animation';
-import ManagePubllishedBlogCard from '../components/ManagePubllishedBlogCard';
+import {
+  ManagePubllishedBlogCard,
+  ManageDraftBlogPost,
+} from '../components/ManagePubllishedBlogCard';
 
 const ManageBlogs = () => {
   const [blogs, setBlogs] = useState(null);
@@ -37,8 +41,6 @@ const ManageBlogs = () => {
         countRoute: '/user-written-blogs-count',
         data_to_send: { draft, query },
       });
-
-      console.log(formattedData);
 
       if (draft) setDrafts(formattedData);
       else setBlogs(formattedData);
@@ -92,7 +94,7 @@ const ManageBlogs = () => {
 
       <InpageNavigation routes={['Published Blogs', 'Drafts']}>
         {
-          // Published blog
+          // Published blogs
           blogs === null ? (
             <Loader />
           ) : blogs.results.length ? (
@@ -107,7 +109,23 @@ const ManageBlogs = () => {
             <NoData message="No published blogs" />
           )
         }
-        <h1>This is Drafts blogs</h1>
+
+        {
+          // Draft blogs
+          drafts === null ? (
+            <Loader />
+          ) : drafts.results.length ? (
+            drafts.results.map((blog, i) => {
+              return (
+                <AnimationWrapper key={i} transition={{ delay: i * 0.04 }}>
+                  <ManageDraftBlogPost blog={blog} index={i + 1} />
+                </AnimationWrapper>
+              );
+            })
+          ) : (
+            <NoData message="No draft blogs" />
+          )
+        }
       </InpageNavigation>
     </>
   );
