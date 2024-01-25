@@ -5,9 +5,11 @@ import axios from 'axios';
 import EditorJS from '@editorjs/editorjs';
 
 import logo from '../images/blog.png';
+import logoLight from '../images/logoWhite.png';
 import AnimationWrapper from '../utils/animation';
 import deafaultBanner from '../images/blog banner.png';
-import { UserContext } from '../App';
+import darkBanner from '../images/blog-banner-dark.png';
+import { ThemeContext, UserContext } from '../App';
 import { uploadImage } from '../utils/aws';
 import { EditorContext } from '../pages/Editor';
 import { tools } from './Tools';
@@ -25,6 +27,7 @@ const BlogEditor = () => {
   const { blogId } = useParams();
 
   const { userAuth: { access_token } = {} } = useContext(UserContext);
+  const { theme } = useContext(ThemeContext);
 
   const [isLoading, setIsLoading] = useState(false);
 
@@ -83,7 +86,7 @@ const BlogEditor = () => {
   const handleError = (e) => {
     let img = e.target;
 
-    img.src = deafaultBanner;
+    img.src = theme === 'light' ? deafaultBanner : darkBanner;
   };
 
   const handlePublish = async () => {
@@ -165,7 +168,7 @@ const BlogEditor = () => {
     <>
       <nav className="navbar">
         <Link to="/" className="flex-none w-10">
-          <img src={logo} alt="logo" />
+          <img src={theme === 'light' ? logo : logoLight} alt="logo" />
         </Link>
         <p className="max-md:hidden text-black line-clamp-1 w-fulls">
           {title.length ? title : 'New Blog'}
@@ -204,7 +207,7 @@ const BlogEditor = () => {
             <textarea
               defaultValue={title}
               placeholder="Blog title"
-              className="text-4xl font-medium w-full h-20 outline-none resize-none mt-10 leading-tight placeholder:opacity-40"
+              className="text-4xl font-medium w-full h-20 outline-none resize-none mt-10 leading-tight placeholder:opacity-40 bg-white"
               onKeyDown={handleTitleKeyDown}
               onChange={handleTitleChange}
             ></textarea>

@@ -2,8 +2,12 @@ import { Link } from 'react-router-dom';
 
 import pageNotFound from '../images/errorpage.jpg';
 import fullLogo from '../images/full-blog-logo.png';
+import fullLogoLight from '../images/full-logo-white.png';
+import { useContext } from 'react';
+import { ThemeContext } from '../App';
 
 const PageNotFound = () => {
+  const { theme } = useContext(ThemeContext);
   return (
     <section className="h-cover relative p-10 flex flex-col items-center gap-20 text-center">
       <img
@@ -20,7 +24,7 @@ const PageNotFound = () => {
 
       <div className="mt-auto">
         <img
-          src={fullLogo}
+          src={theme === 'light' ? fullLogo : fullLogoLight}
           className="h-8 object-contain block mx-auto select-none"
         />
         <p className="mt-5 text-dark-grey">

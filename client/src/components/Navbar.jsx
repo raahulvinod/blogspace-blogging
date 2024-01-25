@@ -3,7 +3,8 @@ import { Link, Outlet, useNavigate } from 'react-router-dom';
 import { IoSearchOutline } from 'react-icons/io5';
 import axios from 'axios';
 
-import logo from '../images/blog.png';
+import darkLogo from '../images/blog.png';
+import lightLogo from '../images/logowhite.png';
 import { ThemeContext, UserContext } from '../App';
 import UserNavigation from './UserNavigation';
 import { removeFromSession, storeInSession } from '../utils/sessions';
@@ -70,7 +71,11 @@ const Navbar = () => {
     <>
       <nav className="navbar z-50">
         <Link to="/" className="flex-none w-12">
-          <img src={logo} alt="logo" className="w-full" />
+          <img
+            src={theme === 'light' ? darkLogo : lightLogo}
+            alt="logo"
+            className="w-full"
+          />
         </Link>
 
         <div
@@ -104,7 +109,11 @@ const Navbar = () => {
             onClick={changeTheme}
             className="w-12 h-12 rounded-full bg-grey relative hover:bg-black/10"
           >
-            <i className="fi fi-rr-moon-stars"></i>
+            <i
+              className={`fi fi-rr-${
+                theme === 'light' ? 'moon-stars' : 'sun'
+              } text-2xl block mt-1`}
+            ></i>
           </button>
 
           {access_token ? (
