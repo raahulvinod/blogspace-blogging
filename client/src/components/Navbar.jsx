@@ -1,12 +1,12 @@
 import { useContext, useEffect, useState } from 'react';
 import { Link, Outlet, useNavigate } from 'react-router-dom';
 import { IoSearchOutline } from 'react-icons/io5';
+import axios from 'axios';
 
 import logo from '../images/blog.png';
-import { UserContext } from '../App';
+import { ThemeContext, UserContext } from '../App';
 import UserNavigation from './UserNavigation';
-import { removeFromSession } from '../utils/sessions';
-import axios from 'axios';
+import { removeFromSession, storeInSession } from '../utils/sessions';
 
 const Navbar = () => {
   const [searchBoxVisibility, setSearchBoxVisibility] = useState(false);
@@ -15,6 +15,8 @@ const Navbar = () => {
   const { userAuth = {}, setUserAuth } = useContext(UserContext);
   const { access_token, profile_img, username, new_notification_available } =
     userAuth;
+
+  const { theme, setTheme } = useContext(ThemeContext);
 
   const navigate = useNavigate();
 
@@ -55,6 +57,15 @@ const Navbar = () => {
     }
   };
 
+  const changeTheme = () => {
+    const newTheme = theme === 'light' ? 'dark' : 'light';
+    setTheme(newTheme);
+
+    document.body.setAttribute('data-theme', newTheme);
+
+    storeInSession('theme', newTheme);
+  };
+
   return (
     <>
       <nav className="navbar z-50">
@@ -88,6 +99,13 @@ const Navbar = () => {
             <i className="fi fi-rr-file-edit"></i>
             <p>Write</p>
           </Link>
+
+          <button
+            onClick={changeTheme}
+            className="w-12 h-12 rounded-full bg-grey relative hover:bg-black/10"
+          >
+            <i className="fi fi-rr-moon-stars"></i>
+          </button>
 
           {access_token ? (
             <>

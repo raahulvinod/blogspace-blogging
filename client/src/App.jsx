@@ -18,41 +18,57 @@ import BlogManagement from './pages/ManageBlogs';
 
 export const UserContext = createContext({});
 
+export const ThemeContext = createContext({});
+
 const App = () => {
   const [userAuth, setUserAuth] = useState();
+  const [theme, setTheme] = useState('light');
 
   useEffect(() => {
     const userInSession = lookInSession('user');
+    const themeInSession = lookInSession('theme');
 
     userInSession
       ? setUserAuth(JSON.parse(userInSession))
       : setUserAuth({ access_token: null });
+
+    if (themeInSession) {
+      setTheme(() => {
+        document.body.setAttribute('data-theme', themeInSession);
+
+        return themeInSession;
+      });
+    } else {
+      document.body.setAttribute('data-theme', theme);
+    }
   }, []);
 
   return (
-    <UserContext.Provider value={{ userAuth, setUserAuth }}>
-      <Routes>
-        <Route path="/editor" element={<Editor />} />
-        <Route path="/editor/:blogId" element={<Editor />} />
-        <Route path="/" element={<Navbar />}>
-          <Route index element={<Home />} />
-          <Route path="dashboard" element={<SideNav />}>
-            <Route path="notifications" element={<Notifications />} />
-            <Route path="blogs" element={<BlogManagement />} />
+    <ThemeContext.Provider value={{ theme, setTheme }}>
+      <UserContext.Provider value={{ userAuth, setUserAuth }}>
+        <Routes>
+          <Route path="/editor" element={<Editor />} />
+          <Route path="/editor/:blogId" element={<Editor />} />
+          <Route path="/" element={<Navbar />}>
+            <Route index element={<Home />} />
+            <Route path="dashboard" element={<SideNav />}>
+              <Route path="notifications" element={<Notifications />} />
+              <Route path="blogs" element={<BlogManagement />} />
+            </Route>
+            <Route path="settings" element={<SideNav />}>
+              <Route path="edit-profile" element={<EditProfile />} />
+              <Route path="change-password" element={<ChangePassword />} />
+            </Route>
+            <Route path="signin" element={<UserAuth type="sign-in" />} />
+            <Route path="signup" element={<UserAuth type="sign-up" />} />
+            <Route path="search/:query" element={<SearchPage />} />
+            <Route path="user/:id" element={<UserProfile />} />
+            <Route path="/blog/:blogId" element={<Blog />} />
+            <Route path="*" element={<PageNotFound />} />
           </Route>
-          <Route path="settings" element={<SideNav />}>
-            <Route path="edit-profile" element={<EditProfile />} />
-            <Route path="change-password" element={<ChangePassword />} />
-          </Route>
-          <Route path="signin" element={<UserAuth type="sign-in" />} />
-          <Route path="signup" element={<UserAuth type="sign-up" />} />
-          <Route path="search/:query" element={<SearchPage />} />
-          <Route path="user/:id" element={<UserProfile />} />
-          <Route path="/blog/:blogId" element={<Blog />} />
-          <Route path="*" element={<PageNotFound />} />
-        </Route>
-      </Routes>
-    </UserContext.Provider>
+        </Routes>
+      </UserContext.Provider>
+    </ThemeContext.Provider>
   );
 };
 
