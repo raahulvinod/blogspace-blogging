@@ -20,9 +20,14 @@ export const UserContext = createContext({});
 
 export const ThemeContext = createContext({});
 
+const darkThemePreference = () =>
+  window.matchMedia('(prefers-color-scheme: dark)').matches;
+
 const App = () => {
   const [userAuth, setUserAuth] = useState();
-  const [theme, setTheme] = useState('light');
+  const [theme, setTheme] = useState(() => {
+    darkThemePreference() ? 'dark' : 'light';
+  });
 
   useEffect(() => {
     const userInSession = lookInSession('user');
