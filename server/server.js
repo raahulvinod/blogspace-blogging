@@ -9,7 +9,7 @@ import blogRouter from './routes/blog.route.js';
 import userRouter from './routes/user.route.js';
 
 import { errorHandler, notFound } from './middlewares/errorHandler.js';
-import serviceAccount from './.firebase/serviceAccountKey.json' assert { type: 'json' };
+import serviceAccount from './serviceAccountKey.json' assert { type: 'json' };
 
 const app = express();
 const PORT = process.env.PORT || 4000;
