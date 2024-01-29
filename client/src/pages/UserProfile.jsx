@@ -111,7 +111,7 @@ const UserProfile = () => {
             <p className="text-xl capitalize h-6">{fullname}</p>
             <p className="">
               {total_posts.toLocaleString()} Blogs -{' '}
-              {total_reads.toLocaleString()} - Reads
+              {total_reads.toLocaleString()} Reads
             </p>
 
             <div className="flex gap-4 mt-2">
