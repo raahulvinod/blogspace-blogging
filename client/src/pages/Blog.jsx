@@ -56,7 +56,6 @@ const Blog = () => {
       });
 
       setBlog(blog);
-      console.log(blog);
 
       if (blog.tags && blog.tags.length > 0) {
         const { data } = await axios.post(

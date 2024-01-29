@@ -17,13 +17,16 @@ const Home = () => {
 
   const categories = [
     'programming',
-    'hollywood',
-    'film making',
-    'social media',
-    'cooking',
+    'productivity',
     'technology',
+    'self improvement',
     'finances',
     'travel',
+    'photography',
+    'lifestyle',
+    'movies and TV shows',
+    'artificial intelligence',
+    'sports',
   ];
 
   const fetchLatestBlogs = async ({ page = 1 }) => {

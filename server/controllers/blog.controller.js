@@ -115,7 +115,7 @@ export const latestBlogs = asyncHandler(async (req, res) => {
   try {
     const { page } = req.body;
 
-    const maxLimit = 5;
+    const maxLimit = 10;
 
     const blogs = await Blog.find({ draft: false })
       .populate(
@@ -181,7 +181,7 @@ export const searchBlogs = asyncHandler(async (req, res) => {
       findQuery = { author, draft: false };
     }
 
-    const maxLimit = limit ? limit : 2;
+    const maxLimit = limit ? limit : 5;
 
     const blogs = await Blog.find(findQuery)
       .populate(

@@ -6,7 +6,6 @@ import { UserContext } from '../App';
 import { profileDataStructure } from '../pages/UserProfile';
 import AnimationWrapper from '../utils/animation';
 import { Loader } from './Loader';
-import InputBox from './InputBox';
 import CustomInput from './CustomInput';
 import { uploadImage } from '../utils/aws';
 import { storeInSession } from '../utils/sessions';

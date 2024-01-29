@@ -75,7 +75,6 @@ const BlogInteraction = () => {
             },
           }
         );
-        console.log(likedByUser);
       } else {
         // not logged in
         toast.error('Please login to like this blog');
