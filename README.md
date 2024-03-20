@@ -15,7 +15,7 @@ Profile sections offer customization options, including profile photo uploads, s
 
 Additional features include dark mode functionality, pagination for improved navigation, and related blog post recommendations for enriched content discovery.
 
-Elevate your blogging experience with this feature-rich application, offering seamless content creation, engagement, and customization
+Elevate your blogging experience with this feature-rich application, offering seamless content creation, engagement, and customization.
 
 ### Cloning the repository
 
