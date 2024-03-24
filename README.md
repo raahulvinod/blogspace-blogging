@@ -1,4 +1,4 @@
-# Full Stack MERN Blogging website : React, Tailwind, MongoDB, Node, Express, AWS S3, Firebase
+# Full Stack MERN Blogging website : React, Tailwind, MongoDB, Node, Express, AWS S3, Firebase.
 
 ![Screenshot (284)](https://github.com/raahulvinod/airbnb-clone/assets/120365941/6d8ef0fe-d581-4e1e-bb93-aabd0048eff4)
 
