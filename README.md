@@ -10,7 +10,6 @@ Users enjoy comprehensive CRUD functionalities, enabling seamless addition, upda
 Stay connected with notifications for likes and comments, facilitating enhanced user engagement. Advanced filtering and searching capabilities streamline content discovery, while trending blogs highlight popular content based on views.
 
 User dashboards provide a personalized experience, showcasing uploaded blog details and engagement metrics such as likes, comments, and reads. EditorJS integration simplifies blog creation, while AWS S3 handles banner uploads for visually appealing content.
-
 Profile sections offer customization options, including profile photo uploads, social links, and password management. Firebase authentication enables secure Google sign-ins, while form validation using Formik and Yup ensures data integrity.
 Additional features include dark mode functionality, pagination for improved navigation, and related blog post recommendations for enriched content discovery.
 
