@@ -7,7 +7,7 @@ import { Loader } from '../components/Loader';
 import { getDay } from '../utils/date';
 import BlogInteraction from '../components/BlogInteraction';
 import BlogPostCard from '../components/BlogPostCard';
-import BlogContent from '../components/Blogcontent';
+import BlogContent from '../components/BlogContent';
 import CommentsContainer from '../components/CommentsContainer';
 import { fetchComments } from '../components/CommentField';
 
