@@ -2,6 +2,7 @@ import express from 'express';
 import 'dotenv/config';
 import cors from 'cors';
 import morgan from 'morgan';
+import fs from "fs";
 
 import connectDb from './config/dbConnect.js';
 import authRouter from './routes/auth.route.js';
@@ -9,7 +10,10 @@ import blogRouter from './routes/blog.route.js';
 import userRouter from './routes/user.route.js';
 
 import { errorHandler, notFound } from './middlewares/errorHandler.js';
-import serviceAccount from './serviceAccountKey.json' assert { type: 'json' };
+
+const serviceAccount = JSON.parse(
+  fs.readFileSync(new URL("./serviceAccountKey.json", import.meta.url))
+);
 
 const app = express();
 const PORT = process.env.PORT || 4000;
