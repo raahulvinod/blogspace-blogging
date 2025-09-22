@@ -4,7 +4,7 @@ import { IoSearchOutline } from 'react-icons/io5';
 import axios from 'axios';
 
 import darkLogo from '../images/blog.png';
-import lightLogo from '../images/logowhite.png';
+import logowhite from '../images/logowhite.png';
 import { ThemeContext, UserContext } from '../App';
 import UserNavigation from './UserNavigation';
 import { removeFromSession, storeInSession } from '../utils/sessions';
@@ -72,7 +72,7 @@ const Navbar = () => {
       <nav className="navbar z-50">
         <Link to="/" className="flex-none w-12">
           <img
-            src={theme === 'light' ? darkLogo : lightLogo}
+            src={theme === 'light' ? darkLogo : logowhite}
             alt="logo"
             className="w-full"
           />
