@@ -5,7 +5,7 @@ import axios from 'axios';
 import EditorJS from '@editorjs/editorjs';
 
 import logo from '../images/blog.png';
-import logoLight from '../images/logoWhite.png';
+import logoWhite from '../images/logoWhite.png';
 import AnimationWrapper from '../utils/animation';
 import deafaultBanner from '../images/blog banner.png';
 import darkBanner from '../images/blog-banner-dark.png';
@@ -168,7 +168,7 @@ const BlogEditor = () => {
     <>
       <nav className="navbar">
         <Link to="/" className="flex-none w-10">
-          <img src={theme === 'light' ? logo : logoLight} alt="logo" />
+          <img src={theme === 'light' ? logo : logoWhite} alt="logo" />
         </Link>
         <p className="max-md:hidden text-black line-clamp-1 w-fulls">
           {title.length ? title : 'New Blog'}
