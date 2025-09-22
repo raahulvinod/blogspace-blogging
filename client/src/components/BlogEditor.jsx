@@ -5,7 +5,7 @@ import axios from 'axios';
 import EditorJS from '@editorjs/editorjs';
 
 import logo from '../images/blog.png';
-import logoWhite from '../images/logoWhite.png';
+import logoWhite from '../images/logowhite.png';
 import AnimationWrapper from '../utils/animation';
 import deafaultBanner from '../images/blog banner.png';
 import darkBanner from '../images/blog-banner-dark.png';
